@@ -1,0 +1,35 @@
+COMPARISON METRICS FOR RESEARCH PAPER
+============================================================
+
+Total Comparisons: 14
+Match Rate: 14.29%
+Cohere Avg Time: 1.092s
+Pattern Avg Time: 0.0s
+Speedup Factor: 15292.0x
+
+Analysis:
+  - Pattern Matcher is 15292.0x faster
+  - But only matches 14.29% of the time
+  - Trade-off: Speed vs Accuracy
+
+Example Mismatches (12):
+
+1. 'Hey how are you?'
+   Cohere: ['general how are you?']
+   Pattern: ['general Hey how are you?']
+
+2. 'Can you add 2 + 3 + 64 - 27 + 5?'
+   Cohere: ['general can you add 2 + 3 + 64 - 27 + 5?']
+   Pattern: ['general Can you add 2 + 3 + 64 - 27 + 5?']
+
+3. 'Can you tell me about engineering specially the computer science and engineering?'
+   Cohere: ['general can you tell me about engineering specially the computer science and engineering?']
+   Pattern: ['realtime Can you tell me about engineering specially the computer science and engineering?']
+
+4. 'Can you play the pretty little baby song?'
+   Cohere: ['play pretty little baby song']
+   Pattern: ['play the pretty little baby song?']
+
+5. 'Can you open whatsapp?'
+   Cohere: ['open whatsapp']
+   Pattern: ['open whatsapp?']

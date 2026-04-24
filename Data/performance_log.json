@@ -1,0 +1,722 @@
+[
+  {
+    "timestamp": "2026-03-04T15:45:21.948724",
+    "query": "Hey how are you?",
+    "decision": [
+      "general how are you?"
+    ],
+    "metrics": {
+      "total_time_seconds": 79.441,
+      "decision_time_seconds": 69.402,
+      "response_time_seconds": 0.468,
+      "tts_time_seconds": 4.573
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T15:46:30.064408",
+    "query": "Porn video.",
+    "decision": [
+      "general porn video."
+    ],
+    "metrics": {
+      "total_time_seconds": 31.054,
+      "decision_time_seconds": 2.426,
+      "response_time_seconds": 0.354,
+      "tts_time_seconds": 18.279
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T15:47:09.071869",
+    "query": "Could you.",
+    "decision": [
+      "general Could you."
+    ],
+    "metrics": {
+      "total_time_seconds": 39.004,
+      "decision_time_seconds": 3.047,
+      "response_time_seconds": 0.441,
+      "tts_time_seconds": 10.855
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T15:48:10.691580",
+    "query": "Ka video.",
+    "decision": [
+      "general Ka video."
+    ],
+    "metrics": {
+      "total_time_seconds": 12.314,
+      "decision_time_seconds": 0.618,
+      "response_time_seconds": 0.373,
+      "tts_time_seconds": 7.706
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:13:09.329662",
+    "query": "Tumi kemon acho.",
+    "decision": [
+      "general Tumi kemon acho."
+    ],
+    "metrics": {
+      "total_time_seconds": 12.98,
+      "decision_time_seconds": 1.171,
+      "response_time_seconds": 0.471,
+      "tts_time_seconds": 4.346
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:13:22.543956",
+    "query": "Tumi bangla.",
+    "decision": [
+      "general Tumi bangla."
+    ],
+    "metrics": {
+      "total_time_seconds": 13.213,
+      "decision_time_seconds": 0.777,
+      "response_time_seconds": 0.341,
+      "tts_time_seconds": 6.2
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:28:27.447040",
+    "query": "How are you?",
+    "decision": [
+      "general how are you?"
+    ],
+    "metrics": {
+      "total_time_seconds": 11.333,
+      "decision_time_seconds": 2.949,
+      "response_time_seconds": 0.724,
+      "tts_time_seconds": 3.185
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:29:04.780671",
+    "query": "Tell me something about yourself.",
+    "decision": [
+      "general tell me something about yourself."
+    ],
+    "metrics": {
+      "total_time_seconds": 37.333,
+      "decision_time_seconds": 3.416,
+      "response_time_seconds": 0.726,
+      "tts_time_seconds": 9.287
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:29:42.618052",
+    "query": "That doesn't come anywhere.",
+    "decision": [
+      "general that doesn't come anywhere."
+    ],
+    "metrics": {
+      "total_time_seconds": 19.785,
+      "decision_time_seconds": 0.751,
+      "response_time_seconds": 0.462,
+      "tts_time_seconds": 7.067
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:30:08.829912",
+    "query": "Please help me when i'm upset?",
+    "decision": [
+      "general Please help me when I'm upset?"
+    ],
+    "metrics": {
+      "total_time_seconds": 26.208,
+      "decision_time_seconds": 0.673,
+      "response_time_seconds": 0.723,
+      "tts_time_seconds": 12.698
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:31:08.631797",
+    "query": "Tell us about the war in iran.",
+    "decision": [
+      "realtime tell us about the war in Iran."
+    ],
+    "metrics": {
+      "total_time_seconds": 43.354,
+      "decision_time_seconds": 0.748,
+      "response_time_seconds": 4.907,
+      "tts_time_seconds": 22.887
+    },
+    "apis_used": [
+      "cohere",
+      "groq",
+      "serper"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "realtime",
+    "estimated_cost": 0.00112
+  },
+  {
+    "timestamp": "2026-03-04T20:31:33.361883",
+    "query": "What is the name of the current prime minister of bangladesh?",
+    "decision": [
+      "realtime what is the name of the current prime minister of bangladesh?"
+    ],
+    "metrics": {
+      "total_time_seconds": 24.727,
+      "decision_time_seconds": 0.929,
+      "response_time_seconds": 3.313,
+      "tts_time_seconds": 10.845
+    },
+    "apis_used": [
+      "cohere",
+      "groq",
+      "serper"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "realtime",
+    "estimated_cost": 0.00112
+  },
+  {
+    "timestamp": "2026-03-04T20:32:08.385409",
+    "query": "Say something about awami league.",
+    "decision": [
+      "realtime say something about awami league."
+    ],
+    "metrics": {
+      "total_time_seconds": 35.022,
+      "decision_time_seconds": 0.698,
+      "response_time_seconds": 2.741,
+      "tts_time_seconds": 24.332
+    },
+    "apis_used": [
+      "cohere",
+      "groq",
+      "serper"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "realtime",
+    "estimated_cost": 0.00112
+  },
+  {
+    "timestamp": "2026-03-04T20:36:15.049937",
+    "query": "How are you?",
+    "decision": [
+      "general how are you?"
+    ],
+    "metrics": {
+      "total_time_seconds": 13.272,
+      "decision_time_seconds": 1.882,
+      "response_time_seconds": 0.57,
+      "tts_time_seconds": 6.389
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:36:37.177240",
+    "query": "I'm not feeling well.",
+    "decision": [
+      "general I'm not feeling well."
+    ],
+    "metrics": {
+      "total_time_seconds": 22.125,
+      "decision_time_seconds": 2.363,
+      "response_time_seconds": 0.771,
+      "tts_time_seconds": 13.236
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:36:54.836228",
+    "query": "Do you speak english now.",
+    "decision": [
+      "general Do you speak english now."
+    ],
+    "metrics": {
+      "total_time_seconds": 17.654,
+      "decision_time_seconds": 0.827,
+      "response_time_seconds": 0.532,
+      "tts_time_seconds": 9.241
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:38:24.269330",
+    "query": "Can you hear me?",
+    "decision": [
+      "general can you hear me?"
+    ],
+    "metrics": {
+      "total_time_seconds": 74.213,
+      "decision_time_seconds": 2.168,
+      "response_time_seconds": 0.72,
+      "tts_time_seconds": 8.329
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:38:39.373606",
+    "query": "You change the language.",
+    "decision": [
+      "general You change the language."
+    ],
+    "metrics": {
+      "total_time_seconds": 15.1,
+      "decision_time_seconds": 0.725,
+      "response_time_seconds": 0.4,
+      "tts_time_seconds": 7.219
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:43:48.713792",
+    "query": "What is your name?",
+    "decision": [
+      "general what is your name?"
+    ],
+    "metrics": {
+      "total_time_seconds": 22.418,
+      "decision_time_seconds": 2.667,
+      "response_time_seconds": 0.848,
+      "tts_time_seconds": 10.899
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:44:04.603414",
+    "query": "He spoke in english.",
+    "decision": [
+      "general he spoke in english."
+    ],
+    "metrics": {
+      "total_time_seconds": 15.889,
+      "decision_time_seconds": 0.688,
+      "response_time_seconds": 1.452,
+      "tts_time_seconds": 7.117
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:44:34.815135",
+    "query": "Yes tomorrow english convert course.",
+    "decision": [
+      "general Yes tomorrow english convert course."
+    ],
+    "metrics": {
+      "total_time_seconds": 19.691,
+      "decision_time_seconds": 2.675,
+      "response_time_seconds": 0.675,
+      "tts_time_seconds": 6.142
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:44:54.740925",
+    "query": "Bangladesh.",
+    "decision": [
+      "general Bangladesh."
+    ],
+    "metrics": {
+      "total_time_seconds": 19.923,
+      "decision_time_seconds": 0.696,
+      "response_time_seconds": 0.527,
+      "tts_time_seconds": 13.097
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:45:33.907079",
+    "query": "If it is said in english, beta comes, in bengali it is called magi who comes?",
+    "decision": [
+      "general If it is said in english"
+    ],
+    "metrics": {
+      "total_time_seconds": 29.866,
+      "decision_time_seconds": 1.472,
+      "response_time_seconds": 0.947,
+      "tts_time_seconds": 20.715
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-03-04T20:46:18.930920",
+    "query": "Post the video.",
+    "decision": [
+      "general Post the video."
+    ],
+    "metrics": {
+      "total_time_seconds": 34.656,
+      "decision_time_seconds": 2.081,
+      "response_time_seconds": 0.728,
+      "tts_time_seconds": 10.374
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-17T22:21:27.979863",
+    "query": "What time?",
+    "decision": [
+      "general what time?"
+    ],
+    "metrics": {
+      "total_time_seconds": 17.132,
+      "decision_time_seconds": 3.105,
+      "response_time_seconds": 0.674,
+      "tts_time_seconds": 6.068
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-17T22:25:02.339167",
+    "query": "Tell me about the iran war.",
+    "decision": [
+      "general tell me about the iran war."
+    ],
+    "metrics": {
+      "total_time_seconds": 69.333,
+      "decision_time_seconds": 2.835,
+      "response_time_seconds": 0.692,
+      "tts_time_seconds": 15.438
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-17T22:25:50.602117",
+    "query": "Recent iran war sampark.",
+    "decision": [
+      "realtime recent iran war sampark."
+    ],
+    "metrics": {
+      "total_time_seconds": 25.845,
+      "decision_time_seconds": 3.883,
+      "response_time_seconds": 2.583,
+      "tts_time_seconds": 11.913
+    },
+    "apis_used": [
+      "cohere",
+      "groq",
+      "serper"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "realtime",
+    "estimated_cost": 0.00112
+  },
+  {
+    "timestamp": "2026-04-17T22:27:53.359972",
+    "query": "How are you? tell me a little about yourself?",
+    "decision": [
+      "general how are you"
+    ],
+    "metrics": {
+      "total_time_seconds": 16.304,
+      "decision_time_seconds": 1.25,
+      "response_time_seconds": 0.777,
+      "tts_time_seconds": 5.69
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-17T22:28:34.092001",
+    "query": "Tell me about bangladesh.",
+    "decision": [
+      "general tell me about bangladesh."
+    ],
+    "metrics": {
+      "total_time_seconds": 40.728,
+      "decision_time_seconds": 2.687,
+      "response_time_seconds": 1.032,
+      "tts_time_seconds": 21.012
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-17T22:29:22.406223",
+    "query": "Tell about the prime minister of bangladesh.",
+    "decision": [
+      "realtime who is the prime minister of bangladesh?"
+    ],
+    "metrics": {
+      "total_time_seconds": 48.307,
+      "decision_time_seconds": 14.004,
+      "response_time_seconds": 2.517,
+      "tts_time_seconds": 9.658
+    },
+    "apis_used": [
+      "cohere",
+      "groq",
+      "serper"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "realtime",
+    "estimated_cost": 0.00112
+  },
+  {
+    "timestamp": "2026-04-22T11:12:22.913206",
+    "query": "Tell me about you.",
+    "decision": [
+      "general tell me about you."
+    ],
+    "metrics": {
+      "total_time_seconds": 51.663,
+      "decision_time_seconds": 15.66,
+      "response_time_seconds": 1.443,
+      "tts_time_seconds": 18.565
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-22T11:12:59.818432",
+    "query": "Tell us something about bangladesh.",
+    "decision": [
+      "general tell us something about bangladesh."
+    ],
+    "metrics": {
+      "total_time_seconds": 36.901,
+      "decision_time_seconds": 0.922,
+      "response_time_seconds": 1.188,
+      "tts_time_seconds": 25.995
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  },
+  {
+    "timestamp": "2026-04-22T11:13:42.002955",
+    "query": "Tell me about the iran war recently.",
+    "decision": [
+      "realtime tell me about the iran war recently."
+    ],
+    "metrics": {
+      "total_time_seconds": 42.18,
+      "decision_time_seconds": 0.831,
+      "response_time_seconds": 3.345,
+      "tts_time_seconds": 30.022
+    },
+    "apis_used": [
+      "cohere",
+      "groq",
+      "serper"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "realtime",
+    "estimated_cost": 0.00112
+  },
+  {
+    "timestamp": "2026-04-22T12:38:12.206330",
+    "query": "\u09a4\u09cb\u09ae\u09be\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7 \u0995\u09bf\u099b\u09c1 \u09ac\u09b2?",
+    "decision": [
+      "general \u09a4\u09cb\u09ae\u09be\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7 \u0995\u09bf\u099b\u09c1 \u09ac\u09b2?"
+    ],
+    "metrics": {
+      "total_time_seconds": 80.54,
+      "decision_time_seconds": 2.773,
+      "response_time_seconds": 1.33,
+      "tts_time_seconds": 21.117
+    },
+    "apis_used": [
+      "cohere",
+      "groq"
+    ],
+    "success": true,
+    "error": null,
+    "query_type": "general",
+    "estimated_cost": 0.00012
+  }
+]

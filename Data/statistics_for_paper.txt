@@ -1,0 +1,11 @@
+PERFORMANCE METRICS FOR RESEARCH PAPER
+============================================================
+
+Total Interactions: 6
+Success Rate: 100.00%
+Average Latency: 24.591s
+P95 Latency: 34.05s
+Average Cost: $0.00012
+
+Query Type Distribution:
+  - general: 100.0%

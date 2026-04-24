@@ -1,0 +1,846 @@
+[
+  {
+    "timestamp": "2026-03-04T15:45:16.903444",
+    "query": "Hey how are you?",
+    "cohere_decision": [
+      "general how are you?"
+    ],
+    "pattern_decision": [
+      "general Hey how are you?"
+    ],
+    "cohere_time_seconds": 69.402,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:45:35.902067",
+    "query": "Play harsh little baby by eminem.",
+    "cohere_decision": [
+      "play harsh little baby"
+    ],
+    "pattern_decision": [
+      "play harsh little baby by eminem."
+    ],
+    "cohere_time_seconds": 2.452,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:45:58.990919",
+    "query": "Pause the video.",
+    "cohere_decision": [
+      "youtube control pause"
+    ],
+    "pattern_decision": [
+      "general Pause the video."
+    ],
+    "cohere_time_seconds": 1.872,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:46:11.425507",
+    "query": "Porn video.",
+    "cohere_decision": [
+      "general porn video."
+    ],
+    "pattern_decision": [
+      "general Porn video."
+    ],
+    "cohere_time_seconds": 2.426,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:46:57.760544",
+    "query": "Could you.",
+    "cohere_decision": [
+      "general Could you."
+    ],
+    "pattern_decision": [
+      "general Could you."
+    ],
+    "cohere_time_seconds": 3.047,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:47:28.297771",
+    "query": "Play the latest song from otilia.",
+    "cohere_decision": [
+      "play latest song from otilia"
+    ],
+    "pattern_decision": [
+      "play the latest song from otilia.",
+      "realtime Play the latest song from otilia."
+    ],
+    "cohere_time_seconds": 0.967,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:47:58.356862",
+    "query": "Frozen heart video.",
+    "cohere_decision": [
+      "youtube control Frozen heart video"
+    ],
+    "pattern_decision": [
+      "general Frozen heart video."
+    ],
+    "cohere_time_seconds": 3.311,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T15:48:02.606625",
+    "query": "Ka video.",
+    "cohere_decision": [
+      "general Ka video."
+    ],
+    "pattern_decision": [
+      "general Ka video."
+    ],
+    "cohere_time_seconds": 0.618,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:13:04.506845",
+    "query": "Tumi kemon acho.",
+    "cohere_decision": [
+      "general Tumi kemon acho."
+    ],
+    "pattern_decision": [
+      "general Tumi kemon acho."
+    ],
+    "cohere_time_seconds": 1.171,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:13:15.998325",
+    "query": "Tumi bangla.",
+    "cohere_decision": [
+      "general Tumi bangla."
+    ],
+    "pattern_decision": [
+      "general Tumi bangla."
+    ],
+    "cohere_time_seconds": 0.777,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:28:23.533543",
+    "query": "How are you?",
+    "cohere_decision": [
+      "general how are you?"
+    ],
+    "pattern_decision": [
+      "general How are you?"
+    ],
+    "cohere_time_seconds": 2.949,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:28:54.763227",
+    "query": "Tell me something about yourself.",
+    "cohere_decision": [
+      "general tell me something about yourself."
+    ],
+    "pattern_decision": [
+      "general Tell me something about yourself."
+    ],
+    "cohere_time_seconds": 3.416,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:29:20.797509",
+    "query": "Play a song from after math.",
+    "cohere_decision": [
+      "play a song from after math"
+    ],
+    "pattern_decision": [
+      "play a song from after math."
+    ],
+    "cohere_time_seconds": 0.85,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:29:35.082124",
+    "query": "That doesn't come anywhere.",
+    "cohere_decision": [
+      "general that doesn't come anywhere."
+    ],
+    "pattern_decision": [
+      "general That doesn't come anywhere."
+    ],
+    "cohere_time_seconds": 0.751,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:29:55.402024",
+    "query": "Please help me when i'm upset?",
+    "cohere_decision": [
+      "general Please help me when I'm upset?"
+    ],
+    "pattern_decision": [
+      "general Please help me when i'm upset?"
+    ],
+    "cohere_time_seconds": 0.673,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:30:16.947575",
+    "query": "Open whatsapp.",
+    "cohere_decision": [
+      "open whatsapp"
+    ],
+    "pattern_decision": [
+      "open whatsapp."
+    ],
+    "cohere_time_seconds": 2.249,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:30:24.924054",
+    "query": "Close whatsapp.",
+    "cohere_decision": [
+      "close whatsapp"
+    ],
+    "pattern_decision": [
+      "close whatsapp."
+    ],
+    "cohere_time_seconds": 2.102,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:30:40.831739",
+    "query": "Tell us about the war in iran.",
+    "cohere_decision": [
+      "realtime tell us about the war in Iran."
+    ],
+    "pattern_decision": [
+      "general Tell us about the war in iran."
+    ],
+    "cohere_time_seconds": 0.748,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:31:19.200981",
+    "query": "What is the name of the current prime minister of bangladesh?",
+    "cohere_decision": [
+      "realtime what is the name of the current prime minister of bangladesh?"
+    ],
+    "pattern_decision": [
+      "realtime What is the name of the current prime minister of bangladesh?"
+    ],
+    "cohere_time_seconds": 0.929,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:31:41.307938",
+    "query": "Say something about awami league.",
+    "cohere_decision": [
+      "realtime say something about awami league."
+    ],
+    "pattern_decision": [
+      "general Say something about awami league."
+    ],
+    "cohere_time_seconds": 0.698,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:32:16.623745",
+    "query": "He struck again.",
+    "cohere_decision": [
+      "general He struck again."
+    ],
+    "pattern_decision": [
+      "general He struck again."
+    ],
+    "cohere_time_seconds": 1.864,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:36:08.085164",
+    "query": "How are you?",
+    "cohere_decision": [
+      "general how are you?"
+    ],
+    "pattern_decision": [
+      "general How are you?"
+    ],
+    "cohere_time_seconds": 1.882,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:36:23.164739",
+    "query": "I'm not feeling well.",
+    "cohere_decision": [
+      "general I'm not feeling well."
+    ],
+    "pattern_decision": [
+      "general I'm not feeling well."
+    ],
+    "cohere_time_seconds": 2.363,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:36:45.060841",
+    "query": "Do you speak english now.",
+    "cohere_decision": [
+      "general Do you speak english now."
+    ],
+    "pattern_decision": [
+      "realtime Do you speak english now."
+    ],
+    "cohere_time_seconds": 0.827,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:37:10.045767",
+    "query": "Change the language please.",
+    "cohere_decision": [
+      "system Change the language"
+    ],
+    "pattern_decision": [
+      "general Change the language please."
+    ],
+    "cohere_time_seconds": 1.559,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:38:15.208672",
+    "query": "Can you hear me?",
+    "cohere_decision": [
+      "general can you hear me?"
+    ],
+    "pattern_decision": [
+      "general Can you hear me?"
+    ],
+    "cohere_time_seconds": 2.168,
+    "pattern_time_seconds": 0.001,
+    "speedup": 2162.98,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:38:31.747215",
+    "query": "You change the language.",
+    "cohere_decision": [
+      "general You change the language."
+    ],
+    "pattern_decision": [
+      "general You change the language."
+    ],
+    "cohere_time_seconds": 0.725,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:43:36.961456",
+    "query": "What is your name?",
+    "cohere_decision": [
+      "general what is your name?"
+    ],
+    "pattern_decision": [
+      "realtime What is your name?"
+    ],
+    "cohere_time_seconds": 2.667,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:43:56.031006",
+    "query": "He spoke in english.",
+    "cohere_decision": [
+      "general he spoke in english."
+    ],
+    "pattern_decision": [
+      "general He spoke in english."
+    ],
+    "cohere_time_seconds": 0.688,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:44:10.814540",
+    "query": "Change to english.",
+    "cohere_decision": [
+      "language english"
+    ],
+    "pattern_decision": [
+      "general Change to english."
+    ],
+    "cohere_time_seconds": 2.137,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:44:27.992209",
+    "query": "Yes tomorrow english convert course.",
+    "cohere_decision": [
+      "general Yes tomorrow english convert course."
+    ],
+    "pattern_decision": [
+      "general Yes tomorrow english convert course."
+    ],
+    "cohere_time_seconds": 2.675,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:44:41.114013",
+    "query": "Bangladesh.",
+    "cohere_decision": [
+      "general Bangladesh."
+    ],
+    "pattern_decision": [
+      "general Bangladesh."
+    ],
+    "cohere_time_seconds": 0.696,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:44:59.090225",
+    "query": "Please convert the language into bengali.",
+    "cohere_decision": [
+      "language bangla"
+    ],
+    "pattern_decision": [
+      "general Please convert the language into bengali."
+    ],
+    "cohere_time_seconds": 0.688,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:45:12.238079",
+    "query": "If it is said in english, beta comes, in bengali it is called magi who comes?",
+    "cohere_decision": [
+      "general If it is said in english"
+    ],
+    "pattern_decision": [
+      "general If it is said in english, beta comes, in bengali it is called magi who comes?"
+    ],
+    "cohere_time_seconds": 1.472,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:45:42.739704",
+    "query": "Play a song by attilia.",
+    "cohere_decision": [
+      "play a song by attilia"
+    ],
+    "pattern_decision": [
+      "play a song by attilia."
+    ],
+    "cohere_time_seconds": 0.71,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-03-04T20:46:07.822698",
+    "query": "Post the video.",
+    "cohere_decision": [
+      "general Post the video."
+    ],
+    "pattern_decision": [
+      "general Post the video."
+    ],
+    "cohere_time_seconds": 2.081,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:21:21.231363",
+    "query": "What time?",
+    "cohere_decision": [
+      "general what time?"
+    ],
+    "pattern_decision": [
+      "general What time?"
+    ],
+    "cohere_time_seconds": 3.105,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:23:31.904447",
+    "query": "Open youtube and play arundom song.",
+    "cohere_decision": [
+      "open youtube",
+      "play arundom song"
+    ],
+    "pattern_decision": [
+      "open youtube",
+      "open play arundom song.",
+      "play arundom song."
+    ],
+    "cohere_time_seconds": 2.993,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:23:52.988175",
+    "query": "Pause the video.",
+    "cohere_decision": [
+      "youtube control pause"
+    ],
+    "pattern_decision": [
+      "general Pause the video."
+    ],
+    "cohere_time_seconds": 0.761,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:24:46.205169",
+    "query": "Tell me about the iran war.",
+    "cohere_decision": [
+      "general tell me about the iran war."
+    ],
+    "pattern_decision": [
+      "realtime Tell me about the iran war."
+    ],
+    "cohere_time_seconds": 2.835,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:25:36.098674",
+    "query": "Recent iran war sampark.",
+    "cohere_decision": [
+      "realtime recent iran war sampark."
+    ],
+    "pattern_decision": [
+      "realtime Recent iran war sampark."
+    ],
+    "cohere_time_seconds": 3.883,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:27:46.886342",
+    "query": "How are you? tell me a little about yourself?",
+    "cohere_decision": [
+      "general how are you"
+    ],
+    "pattern_decision": [
+      "general How are you? tell me a little about yourself?"
+    ],
+    "cohere_time_seconds": 1.25,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:28:12.041593",
+    "query": "Tell me about bangladesh.",
+    "cohere_decision": [
+      "general tell me about bangladesh."
+    ],
+    "pattern_decision": [
+      "realtime Tell me about bangladesh."
+    ],
+    "cohere_time_seconds": 2.687,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:29:10.225204",
+    "query": "Tell about the prime minister of bangladesh.",
+    "cohere_decision": [
+      "realtime who is the prime minister of bangladesh?"
+    ],
+    "pattern_decision": [
+      "realtime Tell about the prime minister of bangladesh."
+    ],
+    "cohere_time_seconds": 14.004,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-17T22:29:37.014003",
+    "query": "Hey bangla bangla saying in bangla means a girl is saying in bangla why don't you listen?",
+    "cohere_decision": [
+      "language bangla"
+    ],
+    "pattern_decision": [
+      "general Hey bangla bangla saying in bangla means a girl is saying in bangla why don't you listen?"
+    ],
+    "cohere_time_seconds": 0.637,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:12:02.897292",
+    "query": "Tell me about you.",
+    "cohere_decision": [
+      "general tell me about you."
+    ],
+    "pattern_decision": [
+      "realtime Tell me about you."
+    ],
+    "cohere_time_seconds": 15.66,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:12:32.629887",
+    "query": "Tell us something about bangladesh.",
+    "cohere_decision": [
+      "general tell us something about bangladesh."
+    ],
+    "pattern_decision": [
+      "general Tell us something about bangladesh."
+    ],
+    "cohere_time_seconds": 0.922,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:13:08.630138",
+    "query": "Tell me about the iran war recently.",
+    "cohere_decision": [
+      "realtime tell me about the iran war recently."
+    ],
+    "pattern_decision": [
+      "realtime Tell me about the iran war recently."
+    ],
+    "cohere_time_seconds": 0.831,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:13:48.343238",
+    "query": "Open youtube.",
+    "cohere_decision": [
+      "open youtube"
+    ],
+    "pattern_decision": [
+      "open youtube."
+    ],
+    "cohere_time_seconds": 1.982,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:14:02.366233",
+    "query": "Launch a video on youtube.",
+    "cohere_decision": [
+      "youtube control status"
+    ],
+    "pattern_decision": [
+      "general Launch a video on youtube."
+    ],
+    "cohere_time_seconds": 1.752,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:14:17.188896",
+    "query": "Play a song on youtube.",
+    "cohere_decision": [
+      "youtube control play"
+    ],
+    "pattern_decision": [
+      "play a song on youtube."
+    ],
+    "cohere_time_seconds": 5.429,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:14:29.434809",
+    "query": "Open whatsapp.",
+    "cohere_decision": [
+      "open whatsapp"
+    ],
+    "pattern_decision": [
+      "open whatsapp."
+    ],
+    "cohere_time_seconds": 0.841,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:14:41.070893",
+    "query": "Close whatsapp.",
+    "cohere_decision": [
+      "close whatsapp"
+    ],
+    "pattern_decision": [
+      "close whatsapp."
+    ],
+    "cohere_time_seconds": 1.277,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:14:48.574427",
+    "query": "Open whatsapp.",
+    "cohere_decision": [
+      "open whatsapp"
+    ],
+    "pattern_decision": [
+      "open whatsapp."
+    ],
+    "cohere_time_seconds": 0.706,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T11:15:24.120180",
+    "query": "Turn off whatsapp.",
+    "cohere_decision": [
+      "close whatsapp"
+    ],
+    "pattern_decision": [
+      "general Turn off whatsapp."
+    ],
+    "cohere_time_seconds": 1.278,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": false,
+    "actual_execution": "cohere"
+  },
+  {
+    "timestamp": "2026-04-22T12:37:49.754791",
+    "query": "\u09a4\u09cb\u09ae\u09be\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7 \u0995\u09bf\u099b\u09c1 \u09ac\u09b2?",
+    "cohere_decision": [
+      "general \u09a4\u09cb\u09ae\u09be\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7 \u0995\u09bf\u099b\u09c1 \u09ac\u09b2?"
+    ],
+    "pattern_decision": [
+      "general \u09a4\u09cb\u09ae\u09be\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7 \u0995\u09bf\u099b\u09c1 \u09ac\u09b2?"
+    ],
+    "cohere_time_seconds": 2.773,
+    "pattern_time_seconds": 0.0,
+    "speedup": 0,
+    "decisions_match": true,
+    "actual_execution": "cohere"
+  }
+]

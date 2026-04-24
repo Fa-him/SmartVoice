@@ -1,0 +1,17 @@
+python-dotenv~=1.1.1
+groq~=0.31.1
+AppOpener
+pywhatkit
+bs4
+pillow
+rich~=14.1.0
+requests
+keyboard
+cohere~=5.18.0
+googlesearch-python
+selenium
+mtranslate
+pygame
+edge-tts~=7.2.3
+PyQt5
+webdriver-manager

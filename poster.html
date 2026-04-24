@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SmartVoice Poster – Landscape 3×4</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background:#e8e8e8;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:20px;
+  font-family:'DM Sans',sans-serif;
+}
+
+/* 3:4 landscape = width is the LONGER side
+   e.g. 36in × 48in → here rendered at 1200px × 900px */
+.poster {
+  width:1200px;
+  height:900px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ── HEADER ─────────────────────────────────────── */
+.header {
+  background:linear-gradient(120deg,#0b0c2a 0%,#1b1370 45%,#0e4da4 100%);
+  padding:16px 32px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.header::before {
+  content:'';position:absolute;top:-50px;right:80px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,215,0,.10);
+}
+.header::after {
+  content:'';position:absolute;bottom:-40px;left:400px;
+  width:150px;height:150px;border-radius:50%;
+  background:rgba(0,220,180,.08);
+}
+.hdr-left { flex:1; }
+.hdr-badge {
+  display:inline-block;
+  background:rgba(255,215,0,.18);border:1px solid rgba(255,215,0,.45);
+  color:#ffd700;font-size:9px;font-weight:600;letter-spacing:1.2px;
+  padding:2px 10px;border-radius:20px;margin-bottom:5px;text-transform:uppercase;
+}
+.hdr-uni   { font-size:9.5px;color:#a8c8ff;letter-spacing:.8px;margin-bottom:1px; }
+.hdr-dept  { font-size:9px;color:#7eb8ff;margin-bottom:6px; }
+.hdr-title {
+  font-family:'Syne',sans-serif;font-size:44px;font-weight:800;
+  color:#fff;line-height:1;letter-spacing:-1.5px;
+}
+.hdr-title span { color:#ffd700; }
+.hdr-sub   { font-size:10.5px;color:#c0d8ff;margin-top:4px;max-width:500px;line-height:1.45; }
+
+.hdr-right {
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;
+  position:relative;z-index:1;
+}
+.hdr-meta { font-size:9.5px;color:#a8c8ff;text-align:right;line-height:1.6; }
+.hdr-meta strong { color:#ffd700; }
+
+/* ── STRIPE ──────────────────────────────────────── */
+.stripe { display:flex;height:5px;flex-shrink:0; }
+.stripe div { flex:1; }
+.s1{background:#ffd700;}.s2{background:#ff5c5c;}.s3{background:#00c9a7;}
+.s4{background:#4a90e2;}.s5{background:#b06bff;}
+
+/* ── BODY GRID ───────────────────────────────────── */
+.body {
+  display:grid;
+  /* 4 columns of equal width */
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  flex:1;
+  overflow:hidden;
+}
+
+/* ── COLUMN ──────────────────────────────────────── */
+.col {
+  padding:10px 10px;
+  border-right:1.5px solid #ebebeb;
+  display:flex;flex-direction:column;gap:8px;
+  overflow:hidden;
+}
+.col:last-child { border-right:none; }
+.col-2 { background:#fafbff; }
+.col-3 { background:#fffaf5; }
+
+/* ── SECTION CARD ────────────────────────────────── */
+.section {
+  background:#fff;border-radius:8px;
+  box-shadow:0 1px 5px rgba(0,0,0,.07);
+  border:1px solid #ebebeb;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.sh {  /* section header */
+  padding:5px 10px;
+  display:flex;align-items:center;gap:6px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:10.5px;
+}
+.sh .ic {
+  width:18px;height:18px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;flex-shrink:0;
+}
+.sb { padding:7px 10px 9px;font-size:9.5px;line-height:1.55;color:#2a2a2a; }
+
+/* section themes */
+.tb  .sh{background:#e8f0fe;color:#1a4faa;} .tb  .sh .ic{background:#1a4faa;color:#fff;}
+.tg  .sh{background:#e6f4ea;color:#155724;} .tg  .sh .ic{background:#28a745;color:#fff;}
+.tp  .sh{background:#f3e8ff;color:#5b1fa0;} .tp  .sh .ic{background:#7c3aed;color:#fff;}
+.ty  .sh{background:#fff8e1;color:#7a5800;} .ty  .sh .ic{background:#ffc107;color:#7a5800;}
+.tt  .sh{background:#e0f7f4;color:#0a6460;} .tt  .sh .ic{background:#00b4a0;color:#fff;}
+.to  .sh{background:#fff3e0;color:#7d3000;} .to  .sh .ic{background:#f97316;color:#fff;}
+.tr  .sh{background:#fdecea;color:#991b1b;} .tr  .sh .ic{background:#e53e3e;color:#fff;}
+.tn  .sh{background:#e6eaf5;color:#1e2a5a;} .tn  .sh .ic{background:#1e2a5a;color:#fff;}
+
+/* ── BULLET LIST ─────────────────────────────────── */
+ul.bl { list-style:none; }
+ul.bl li {
+  padding:2px 0 2px 12px;position:relative;
+  font-size:9.5px;line-height:1.5;color:#2a2a2a;
+  border-bottom:1px dashed #f2f2f2;
+}
+ul.bl li:last-child{border-bottom:none;}
+ul.bl li::before{content:'▸';position:absolute;left:0;font-size:8px;top:4px;}
+ul.bl.b::before,.bl.b li::before{color:#1a4faa;}
+ul.bl.p li::before{color:#7c3aed;}
+ul.bl.g li::before{color:#28a745;}
+ul.bl.t li::before{color:#00b4a0;}
+ul.bl.o li::before{color:#f97316;}
+ul.bl.r li::before{color:#e53e3e;}
+
+/* ── ARCH DIAGRAM ────────────────────────────────── */
+.arch { display:flex;flex-direction:column;gap:3px;align-items:center; }
+.arch-row { display:flex;gap:4px;width:100%;justify-content:center; }
+.abox {
+  flex:1;border-radius:6px;padding:4px 6px;font-size:8.5px;
+  font-weight:600;text-align:center;border:1.5px solid;line-height:1.3;
+}
+.ab-blue  {background:#e8f0fe;border-color:#4a80dc;color:#1a3a8a;}
+.ab-purp  {background:#f3e8ff;border-color:#9b59e8;color:#4a1a8a;}
+.ab-green {background:#e6f4ea;border-color:#28a745;color:#155724;}
+.ab-yel   {background:#fff8e1;border-color:#ffc107;color:#7a5800;}
+.ab-teal  {background:#e0f7f4;border-color:#00b4a0;color:#0a5e58;}
+.ab-org   {background:#fff3e0;border-color:#f97316;color:#7d2600;}
+.ab-gray  {background:#f5f5f5;border-color:#aaa;color:#333;}
+.ab-red   {background:#fdecea;border-color:#e53e3e;color:#7a1515;}
+
+.arw { width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #bbb;margin:1px auto; }
+.arw-r { color:#bbb;font-size:11px;font-weight:700;flex-shrink:0;align-self:center; }
+
+/* ── FLOW ────────────────────────────────────────── */
+.flow { display:flex;flex-direction:column;gap:2px; }
+.frow { display:flex;align-items:center;gap:4px; }
+.fbox {
+  flex:1;border-radius:6px;padding:4px 7px;
+  font-size:8.5px;font-weight:600;text-align:center;border:1.5px solid;line-height:1.3;
+}
+
+/* ── METRICS ─────────────────────────────────────── */
+.mgrid { display:grid;grid-template-columns:1fr 1fr;gap:5px; }
+.mcard {
+  background:#f8f9ff;border:1px solid #dde4ff;
+  border-radius:7px;padding:6px 8px;text-align:center;
+}
+.mval {
+  font-family:'Syne',sans-serif;font-size:16px;font-weight:800;
+  line-height:1;margin-bottom:2px;
+}
+.mlbl { font-size:8.5px;color:#666;line-height:1.3; }
+
+/* ── OUTCOME LIST ────────────────────────────────── */
+.oitem {
+  display:flex;align-items:flex-start;gap:6px;
+  padding:4px 0;border-bottom:1px solid #f2f2f2;
+  font-size:9.5px;line-height:1.45;color:#222;
+}
+.oitem:last-child{border-bottom:none;}
+.odot {
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8.5px;color:#fff;font-weight:700;margin-top:1px;
+}
+
+/* ── RISK TABLE ──────────────────────────────────── */
+.rtable { width:100%;border-collapse:collapse;font-size:8.5px; }
+.rtable th {
+  background:#1a1060;color:#ffd700;
+  padding:4px 6px;text-align:left;font-size:8px;font-weight:700;
+}
+.rtable td { padding:3px 6px;border-bottom:1px solid #eee;vertical-align:top;color:#2a2a2a; }
+.rtable tr:nth-child(even) td{background:#f8f9ff;}
+.badge { display:inline-block;padding:1px 5px;border-radius:10px;font-size:7.5px;font-weight:700; }
+.bhi  {background:#fdecea;color:#b91c1c;}
+.bmed {background:#fff8e1;color:#92400e;}
+.blo  {background:#e6f4ea;color:#166534;}
+
+/* ── TECH TAGS ───────────────────────────────────── */
+.tags { display:flex;flex-wrap:wrap;gap:4px; }
+.tag {
+  font-size:8.5px;padding:2px 7px;border-radius:20px;font-weight:600;border:1px solid;
+}
+.tg-b{background:#e8f0fe;color:#1a4faa;border-color:#4a80dc;}
+.tg-t{background:#e0f7f4;color:#0a5e58;border-color:#00b4a0;}
+.tg-p{background:#f3e8ff;color:#4a1a8a;border-color:#9b59e8;}
+.tg-o{background:#fff3e0;color:#7d2600;border-color:#f97316;}
+.tg-y{background:#fff8e1;color:#7a5800;border-color:#ffc107;}
+
+/* ── TEAM ────────────────────────────────────────── */
+.tmember { display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px dashed #eee; }
+.tmember:last-child{border-bottom:none;}
+.av {
+  width:26px;height:26px;border-radius:50%;font-size:8.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;
+}
+.tname { font-size:9.5px;font-weight:600;color:#1a1a2e;line-height:1.3; }
+.tid   { font-size:8.5px;color:#888; }
+
+/* ── SUPERVISOR CARD ─────────────────────────────── */
+.supcard {
+  background:linear-gradient(135deg,#1a1060,#0e4da4);
+  border-radius:8px;padding:8px 12px;color:#fff;text-align:center;
+}
+.suplbl  { font-size:8.5px;color:#a8b8e8;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px; }
+.supname { font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#ffd700;margin-bottom:2px; }
+.suptitle{ font-size:8.5px;color:#c8d8ff;line-height:1.4; }
+
+/* ── PRIVACY BANNER ──────────────────────────────── */
+.pvbanner {
+  background:linear-gradient(90deg,#0a5e58,#00b4a0);
+  border-radius:7px;padding:6px 10px;
+  display:flex;align-items:center;gap:7px;
+}
+.pvbanner .ico{font-size:16px;}
+.pvbanner .txt{font-size:9.5px;font-weight:600;color:#fff;line-height:1.4;}
+.pvbanner .sub{font-size:8.5px;color:#c0f0eb;font-weight:400;}
+
+/* ── FOOTER ──────────────────────────────────────── */
+.footer {
+  background:#0a0a2e;padding:7px 32px;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+}
+.ft { font-size:8.5px;color:#7a8ab8; }
+.ft-c{ font-size:8.5px;color:#ffd700;font-weight:600; }
+
+@media print {
+  body{background:#fff;padding:0;}
+  .poster{width:100%;height:auto;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <div class="hdr-left">
+      <div class="hdr-badge">CSE 4100 · Capstone / IDP Project</div>
+      <div class="hdr-uni">Bangladesh Army University of Engineering &amp; Technology (BAUET), Qadirabad, Natore-6431</div>
+      <div class="hdr-dept">Department of Computer Science and Engineering</div>
+      <div class="hdr-title">Smart<span>Voice</span></div>
+      <div class="hdr-sub">Personalized PC Assistant for Offline, Privacy-First Task Automation via Voice Commands</div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-meta">
+        <strong>Batch:</strong> 16th &nbsp;|&nbsp; <strong>Session:</strong> 2022–23<br>
+        <strong>Course:</strong> CSE 4100<br>
+        <strong>Date:</strong> 22 April 2026
+      </div>
+    </div>
+  </div>
+  <div class="stripe"><div class="s1"></div><div class="s2"></div><div class="s3"></div><div class="s4"></div><div class="s5"></div></div>
+
+  <!-- ══ BODY: 4 columns ══ -->
+  <div class="body">
+
+    <!-- ── COL 1 ── -->
+    <div class="col">
+
+      <div class="section tb">
+        <div class="sh"><div class="ic">💡</div>Introduction</div>
+        <div class="sb">
+          <ul class="bl b">
+            <li>Offline, privacy-first desktop voice assistant for Windows</li>
+            <li>All processing (STT, NLU, Executor, TTS) runs <strong>locally</strong> — zero cloud dependency</li>
+            <li>Automates system control, file management &amp; productivity tools</li>
+            <li>Confirmation prompts prevent accidental critical actions</li>
+            <li>Tamper-resistant <strong>audit log</strong> records every command</li>
+            <li>Modular design enables future cross-platform expansion</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section tp">
+        <div class="sh"><div class="ic">🎯</div>Objectives</div>
+        <div class="sb">
+          <ul class="bl p">
+            <li>Local STT pipeline with <strong>WER ≤ 10%</strong>, latency ≤ 300 ms</li>
+            <li>Secure Command Executor with allow-list &amp; confirmation guards</li>
+            <li>All audio &amp; data stays on-device — no network transfer</li>
+            <li>Encrypted SQLite DB + tamper-resistant command log</li>
+            <li>End-to-end validation: WER, latency, SUS ≥ 80</li>
+            <li>Full technical docs, user manual &amp; demo prototype</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section tt">
+        <div class="sh"><div class="ic">⚙️</div>Technology Stack</div>
+        <div class="sb">
+          <div style="font-size:8.5px;font-weight:600;color:#0a5e58;margin-bottom:3px;">Speech &amp; Language</div>
+          <div class="tags" style="margin-bottom:6px;">
+            <span class="tag tg-t">Vosk / CMU Sphinx</span>
+            <span class="tag tg-t">spaCy / Rasa</span>
+            <span class="tag tg-t">pyttsx3 / eSpeak</span>
+          </div>
+          <div style="font-size:8.5px;font-weight:600;color:#1a4faa;margin-bottom:3px;">UI &amp; Storage</div>
+          <div class="tags" style="margin-bottom:6px;">
+            <span class="tag tg-b">PyQt / Tkinter</span>
+            <span class="tag tg-b">SQLite + SQLCipher</span>
+          </div>
+          <div style="font-size:8.5px;font-weight:600;color:#7d2600;margin-bottom:3px;">Core &amp; Testing</div>
+          <div class="tags">
+            <span class="tag tg-o">Python 3.x</span>
+            <span class="tag tg-o">PyTest</span>
+            <span class="tag tg-o">Windows 10+</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pvbanner">
+        <div class="ico">🔒</div>
+        <div class="txt">100% Offline &amp; Private<div class="sub">Zero data leaves the device. Encrypted local storage.</div></div>
+      </div>
+
+      <div class="section tr">
+        <div class="sh"><div class="ic">🔍</div>Scope &amp; Limitations</div>
+        <div class="sb">
+          <ul class="bl r">
+            <li>Initial target: <strong>Windows 10+</strong>; architecture allows future expansion</li>
+            <li>No cloud, biometric auth or emotion recognition in scope</li>
+            <li>Commands restricted to <strong>allow-listed actions</strong></li>
+            <li>Offline STT may struggle with heavy accents / noisy rooms</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /col1 -->
+
+    <!-- ── COL 2 ── -->
+    <div class="col col-2">
+
+      <div class="section tn">
+        <div class="sh"><div class="ic">🏗</div>System Architecture</div>
+        <div class="sb">
+          <div class="arch">
+            <div class="arch-row">
+              <div class="abox ab-gray" style="max-width:100%;">🎤 Microphone Input (USB / Built-in)</div>
+            </div>
+            <div class="arw"></div>
+            <div class="arch-row">
+              <div class="abox ab-blue">🗣 Speech-to-Text<br><span style="font-size:7.5px;font-weight:400">Vosk / CMU Sphinx</span></div>
+              <div class="arw-r">→</div>
+              <div class="abox ab-purp">🧠 NLU Intent Parser<br><span style="font-size:7.5px;font-weight:400">spaCy / Rasa</span></div>
+            </div>
+            <div class="arw"></div>
+            <div class="arch-row">
+              <div class="abox ab-yel" style="max-width:100%;">⚡ Command Executor — Policy Guard + Allow-list</div>
+            </div>
+            <div class="arw"></div>
+            <div class="arch-row">
+              <div class="abox ab-green">🗂 System &amp;<br>File Module</div>
+              <div class="abox ab-teal">📋 Productivity<br>Module</div>
+              <div class="abox ab-org">🔔 Confirmation<br>Prompts</div>
+            </div>
+            <div class="arw"></div>
+            <div class="arch-row">
+              <div class="abox ab-purp">🔐 SQLite<br>Encrypted Log</div>
+              <div class="arw-r">→</div>
+              <div class="abox ab-blue">📢 TTS Feedback<br>pyttsx3 / eSpeak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section ty">
+        <div class="sh"><div class="ic">📊</div>Expected Performance Metrics</div>
+        <div class="sb">
+          <div class="mgrid">
+            <div class="mcard"><div class="mval" style="color:#28a745;">≤10%</div><div class="mlbl">Word Error Rate (WER)</div></div>
+            <div class="mcard"><div class="mval" style="color:#7c3aed;">≤300ms</div><div class="mlbl">Recognition Latency</div></div>
+            <div class="mcard"><div class="mval" style="color:#1a4faa;">≥90%</div><div class="mlbl">Task Success Rate</div></div>
+            <div class="mcard"><div class="mval" style="color:#f97316;">≥80</div><div class="mlbl">SUS Usability Score</div></div>
+            <div class="mcard"><div class="mval" style="color:#0a6460;">~150MB</div><div class="mlbl">Memory Footprint</div></div>
+            <div class="mcard"><div class="mval" style="color:#e53e3e;">≤1s</div><div class="mlbl">End-to-End Response</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col2 -->
+
+    <!-- ── COL 3 ── -->
+    <div class="col col-3">
+
+      <div class="section tg">
+        <div class="sh"><div class="ic">📐</div>Design Methodology</div>
+        <div class="sb">
+          <div class="flow">
+            <div class="frow">
+              <div class="fbox ab-gray">📋 Requirements &amp; Scoping<br><span style="font-size:7.5px;font-weight:400">(W1–W2)</span></div>
+              <div class="arw-r">→</div>
+              <div class="fbox ab-blue">🏗 Architecture &amp; Module Design<br><span style="font-size:7.5px;font-weight:400">(W3–W4)</span></div>
+            </div>
+            <div class="arw"></div>
+            <div class="frow">
+              <div class="fbox ab-teal">🎙 Data Prep &amp; Offline Setup<br><span style="font-size:7.5px;font-weight:400">(W5–W6)</span></div>
+              <div class="arw-r">→</div>
+              <div class="fbox ab-purp">🧪 STT &amp; NLU Prototype<br><span style="font-size:7.5px;font-weight:400">(W7–W9)</span></div>
+            </div>
+            <div class="arw"></div>
+            <div class="frow">
+              <div class="fbox ab-yel">⚡ Executor &amp; Integration<br><span style="font-size:7.5px;font-weight:400">(W10–W12)</span></div>
+              <div class="arw-r">→</div>
+              <div class="fbox ab-green">🔊 TTS + UI Dev<br><span style="font-size:7.5px;font-weight:400">(W13–W16)</span></div>
+            </div>
+            <div class="arw"></div>
+            <div class="frow">
+              <div class="fbox ab-org">🔐 Security Hardening<br><span style="font-size:7.5px;font-weight:400">(W24)</span></div>
+              <div class="arw-r">→</div>
+              <div class="fbox ab-red">🧑‍💻 Usability &amp; Stress Tests<br><span style="font-size:7.5px;font-weight:400">(W25–W26)</span></div>
+            </div>
+            <div class="arw"></div>
+            <div class="frow">
+              <div class="fbox ab-gray" style="max-width:100%;">📦 Documentation, Demo &amp; Final Submission (W27–W28)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section tp">
+        <div class="sh"><div class="ic">⚠️</div>Risk Summary</div>
+        <div class="sb" style="padding:0;">
+          <table class="rtable">
+            <thead>
+              <tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>STT Recognition Failure</td><td><span class="badge bhi">High</span></td><td>Push-to-talk fallback + custom lexicons</td></tr>
+              <tr><td>NLU Misinterpretation</td><td><span class="badge bmed">Med</span></td><td>Strict intent/slot mapping</td></tr>
+              <tr><td>TTS Latency / Failure</td><td><span class="badge bmed">Med</span></td><td>Parallel processing + visual fallback</td></tr>
+              <tr><td>Privacy Breach</td><td><span class="badge bhi">High</span></td><td>Offline-first + encrypted DB</td></tr>
+              <tr><td>DB Corruption</td><td><span class="badge bmed">Med</span></td><td>SQLite auto-backup</td></tr>
+              <tr><td>User Confusion</td><td><span class="badge bmed">Med</span></td><td>Confirmation prompts + TTS feedback</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section tb">
+        <div class="sh"><div class="ic">💰</div>Cost Overview</div>
+        <div class="sb">
+          <ul class="bl b">
+            <li>All software: <strong>free/open-source</strong> (Vosk, spaCy, pyttsx3, SQLite)</li>
+            <li>Hardware: Standard PC ≥ 8GB RAM, noise-cancelling USB mic</li>
+            <li>Human resources (28 weeks part-time): ~329,000 BDT</li>
+            <li>Testing, deployment &amp; miscellaneous: ~11,500 BDT</li>
+            <li><strong>Total estimated: ~394,000 BDT</strong></li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /col3 -->
+
+    <!-- ── COL 4 ── -->
+    <div class="col">
+
+      <div class="section tg">
+        <div class="sh"><div class="ic">✅</div>Expected Outcomes</div>
+        <div class="sb">
+          <div class="oitem"><div class="odot" style="background:#1a4faa;">1</div><div>Fully offline PC assistant with voice control &amp; <strong>zero cloud dependency</strong></div></div>
+          <div class="oitem"><div class="odot" style="background:#28a745;">2</div><div>≥90% task success rate for file, system &amp; productivity automation</div></div>
+          <div class="oitem"><div class="odot" style="background:#7c3aed;">3</div><div>Privacy-by-design: <strong>encrypted DB</strong> + tamper-resistant audit log</div></div>
+          <div class="oitem"><div class="odot" style="background:#f97316;">4</div><div>Scalable modular architecture for cross-platform expansion</div></div>
+          <div class="oitem"><div class="odot" style="background:#00b4a0;">5</div><div>Validated with 10–15 user pilot tests achieving <strong>SUS ≥ 80</strong></div></div>
+          <div class="oitem"><div class="odot" style="background:#e53e3e;">6</div><div>Complete technical docs, user manual &amp; demo prototype delivered</div></div>
+        </div>
+      </div>
+
+      <div class="section to">
+        <div class="sh"><div class="ic">🔑</div>Key System Requirements</div>
+        <div class="sb">
+          <ul class="bl o">
+            <li><strong>Voice Recognition:</strong> Predefined commands recognized locally in real-time</li>
+            <li><strong>Command Execution:</strong> User-level permissions + critical action confirmations</li>
+            <li><strong>Audit Logging:</strong> Timestamped, tamper-resistant command log</li>
+            <li><strong>User Feedback:</strong> Visual + auditory response within ≤1 second</li>
+            <li><strong>Offline Operation:</strong> Zero internet or cloud service dependency</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section tp">
+        <div class="sh"><div class="ic">👥</div>Team Members</div>
+        <div class="sb">
+          <div class="tmember">
+            <div class="av" style="background:#1a4faa;">MF</div>
+            <div><div class="tname">Md Fahim Bin Alam</div><div class="tid">0812220205101037</div></div>
+          </div>
+          <div class="tmember">
+            <div class="av" style="background:#7c3aed;">MF</div>
+            <div><div class="tname">Md. Foisal Haque Sohom</div><div class="tid">0812220205101057</div></div>
+          </div>
+          <div class="tmember">
+            <div class="av" style="background:#00b4a0;">NT</div>
+            <div><div class="tname">Nishat Tasnim Chowdhury</div><div class="tid">0812220105101022</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="supcard">
+        <div class="suplbl">Supervisor</div>
+        <div class="supname">Mohammed Golam Sarwar Bhuyan</div>
+        <div class="suptitle">Professor &amp; Dean, Faculty of ECE<br>BAUET · Batch 16 · Session 2022–23</div>
+      </div>
+
+    </div><!-- /col4 -->
+
+  </div><!-- /body -->
+
+  <div class="stripe"><div class="s1"></div><div class="s2"></div><div class="s3"></div><div class="s4"></div><div class="s5"></div></div>
+  <div class="footer">
+    <div class="ft">Department of CSE · BAUET · Qadirabad, Natore-6431</div>
+    <div class="ft-c">CSE 3200 — Integrated Development / Capstone Project</div>
+    <div class="ft">Batch 16 · Session 2022–23</div>
+  </div>
+
+</div>
+</body>
+</html>
