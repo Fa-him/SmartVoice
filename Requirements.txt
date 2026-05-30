@@ -1,17 +1,30 @@
+# --- Core Frameworks & GUI ---
+PyQt5
 python-dotenv~=1.1.1
+
+# --- AI & Search Engines ---
 groq~=0.31.1
+cohere~=5.18.0
+duckduckgo_search
+requests
+beautifulsoup4
+
+# --- Automation & System Control ---
 AppOpener
 pywhatkit
-bs4
-pillow
-rich~=14.1.0
-requests
+pyautogui
+pyperclip
+psutil
 keyboard
-cohere~=5.18.0
-googlesearch-python
-selenium
-mtranslate
+screen-brightness-control
+
+# --- Audio & Speech (STT/TTS) ---
 pygame
-edge-tts~=7.2.3
-PyQt5
+edge-tts
+selenium
 webdriver-manager
+mtranslate
+
+# --- Utilities & Data Handling ---
+rich~=14.1.0
+Pillow
