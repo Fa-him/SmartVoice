@@ -1,12 +1,11 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QStackedWidget, QWidget, QLineEdit, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QFrame, QLabel, QSizePolicy
 from PyQt5.QtGui import QIcon, QPainter, QMovie, QColor, QTextCharFormat, QFont, QPixmap, QTextBlockFormat
 from PyQt5.QtCore import Qt, QSize, QTimer
-from dotenv import dotenv_values
+from Backend.Config import get_env
 import sys
 import os
 
-env_vars = dotenv_values(".env")
-Assistantname = env_vars.get("Assistantname")
+Assistantname = get_env("Assistantname", "SmartVoice")
 current_dir = os.getcwd()
 old_chat_message = ""
 TempDirPath = rf'{current_dir}\Frontend\Files'

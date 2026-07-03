@@ -1,17 +1,14 @@
 import requests
 from groq import Groq
-from json import load, dump
+from json import JSONDecodeError, load, dump
 import datetime
-from dotenv import dotenv_values
+from Backend.Config import get_env, require_env
 from .LanguageManager import language_manager
 
-env_vars      = dotenv_values(".env")
-Username      = env_vars.get("Username")
-Assistantname = env_vars.get("Assistantname")
-GroqAPIKey    = env_vars.get("GroqAPIKey")
-SerperAPIkey  = env_vars.get("SerperAPIkey")
-
-client = Groq(api_key=GroqAPIKey)
+Username      = get_env("Username", "User")
+Assistantname = get_env("Assistantname", "SmartVoice")
+SerperAPIkey  = get_env("SerperAPIkey")
+client        = Groq(api_key=require_env("GroqAPIKey"))
 
 # Base system prompt — language instruction injected dynamically below
 SystemBase = f"""Hello, I am {Username}. You are a very accurate and advanced AI assistant named {Assistantname} with real-time up-to-date information from the internet.
@@ -20,12 +17,22 @@ SystemBase = f"""Hello, I am {Username}. You are a very accurate and advanced AI
 *** Do not provide notes. Never mention your training data. ***
 """
 
-try:
-    with open(r"Data\Chatlog.json", "r") as f:
-        messages = load(f)
-except:
+def _load_messages():
+    try:
+        with open(r"Data\Chatlog.json", "r") as f:
+            return load(f)
+    except (FileNotFoundError, JSONDecodeError):
+        with open(r"Data\Chatlog.json", "w") as f:
+            dump([], f)
+        return []
+
+
+def _save_messages(chat_messages):
     with open(r"Data\Chatlog.json", "w") as f:
-        dump([], f)
+        dump(chat_messages, f, indent=4)
+
+
+messages = _load_messages()
 
 def SerperSearch(query):
     if not SerperAPIkey:
@@ -84,40 +91,45 @@ def RealtimeSearchEngine(prompt):
     """
     global messages
 
-    with open(r"Data\Chatlog.json", "r") as f:
-        messages = load(f)
+    try:
+        messages = _load_messages()
+        messages.append({"role": "user", "content": f"{prompt}"})
 
-    messages.append({"role": "user", "content": f"{prompt}"})
+        SystemChatBot = _build_system_chatbot()
+        SystemChatBot.append({"role": "system", "content": SerperSearch(prompt)})
 
-    SystemChatBot = _build_system_chatbot()
-    SystemChatBot.append({"role": "system", "content": SerperSearch(prompt)})
+        completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=(
+                SystemChatBot
+                + [{"role": "system", "content": Information()}]
+                + messages
+            ),
+            temperature=0.7,
+            max_tokens=2048,
+            top_p=1,
+            stream=True,
+            stop=None
+        )
 
-    completion = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=(
-            SystemChatBot
-            + [{"role": "system", "content": Information()}]
-            + messages
-        ),
-        temperature=0.7,
-        max_tokens=2048,
-        top_p=1,
-        stream=True,
-        stop=None
-    )
+        Answer = ""
+        for chunk in completion:
+            if chunk.choices[0].delta.content:
+                Answer += chunk.choices[0].delta.content
 
-    Answer = ""
-    for chunk in completion:
-        if chunk.choices[0].delta.content:
-            Answer += chunk.choices[0].delta.content
+        Answer = Answer.strip().replace("</s>", "")
+        messages.append({"role": "assistant", "content": Answer})
 
-    Answer = Answer.strip().replace("</s>", "")
-    messages.append({"role": "assistant", "content": Answer})
+        _save_messages(messages)
 
-    with open(r"Data\Chatlog.json", "w") as f:
-        dump(messages, f, indent=4)
+        return AnswerModifier(Answer)
 
-    return AnswerModifier(Answer)
+    except Exception as e:
+        print(f"Error in RealtimeSearchEngine: {e}")
+        return (
+            "Sorry, I could not complete the realtime search right now. "
+            "Please check the Groq/Serper API keys and network connection."
+        )
 
 if __name__ == "__main__":
     while True:

@@ -1,14 +1,15 @@
-import pygame
 import random
 import asyncio
 import edge_tts
 import os
-from dotenv import dotenv_values
+from Backend.Config import get_env
 from .LanguageManager import language_manager
 
-# Load environment variables (fallback default voice)
-env_vars      = dotenv_values(".env")
-_DefaultVoice = env_vars.get("AssistantVoice", "en-CA-LiamNeural")
+os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
+
+import pygame
+
+_DefaultVoice = get_env("AssistantVoice", "en-CA-LiamNeural")
 
 def _get_voice() -> str:
     """Get the correct TTS voice for the currently detected language."""
@@ -39,31 +40,31 @@ async def TextToAudioFile(text: str) -> None:
 
 def TTS(Text, func=lambda r=None: True):
     """Play text as speech using the currently active language's voice."""
-    while True:
+    try:
+        asyncio.run(TextToAudioFile(Text))
+
+        pygame.mixer.init()
+        pygame.mixer.music.load(r"Data\speech.mp3")
+        pygame.mixer.music.play()
+
+        while pygame.mixer.music.get_busy():
+            if func() == False:
+                break
+            pygame.time.Clock().tick(10)
+
+        return True
+
+    except Exception as e:
+        print(f"Error in TTS: {e}")
+        return False
+
+    finally:
         try:
-            asyncio.run(TextToAudioFile(Text))
-
-            pygame.mixer.init()
-            pygame.mixer.music.load(r"Data\speech.mp3")
-            pygame.mixer.music.play()
-
-            while pygame.mixer.music.get_busy():
-                if func() == False:
-                    break
-                pygame.time.Clock().tick(10)
-
-            return True
-
+            func(False)
+            pygame.mixer.music.stop()
+            pygame.mixer.quit()
         except Exception as e:
-            print(f"Error in TTS: {e}")
-
-        finally:
-            try:
-                func(False)
-                pygame.mixer.music.stop()
-                pygame.mixer.quit()
-            except Exception as e:
-                print(f"Error in TTS finally block: {e}")
+            print(f"Error in TTS cleanup: {e}")
 
 def TextToSpeech(Text, func=lambda r=None: True):
     """
@@ -92,12 +93,12 @@ def TextToSpeech(Text, func=lambda r=None: True):
     responses = responses_bn if language_manager.is_bangla() else responses_en
 
     if len(Data) > 4 and len(Text) >= 250:
-        TTS(
+        return TTS(
             ".".join(Text.split(".")[0:2]) + "." + random.choice(responses),
             func
         )
     else:
-        TTS(Text, func)
+        return TTS(Text, func)
 
 if __name__ == "__main__":
     while True:

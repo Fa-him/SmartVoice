@@ -12,29 +12,35 @@ from Frontend.GUI import (
 from Backend.Model import FirstlayerDMM
 from Backend.RealtimeSearchEngine import RealtimeSearchEngine
 from Backend.Automation import Automation
-from Backend.SpeechToText import SpeechRecognition
+from Backend.SpeechToText import SpeechRecognition, SpeechRecognitionError
 from Backend.Chatbot import ChatBot
 from Backend.TextToSpeech import TextToSpeech
 from Backend.PerformanceLogger import logger
 from Backend.SimpleDecisionMaker import SimplePatternMatcher
 from Backend.LanguageManager import language_manager
-from dotenv import dotenv_values
+from Backend.Config import get_env, require_env
+from Backend.ReminderManager import pop_due_reminders
 from asyncio import run
 from time import sleep
 import subprocess
 import threading
 import json
 import time
-import os
+import sys
 
-env_vars      = dotenv_values(".env")
-Username      = env_vars.get("Username")
-Assistantname = env_vars.get("Assistantname")
+try:
+    sys.stdout.reconfigure(errors="replace")
+    sys.stderr.reconfigure(errors="replace")
+except Exception:
+    pass
+
+Username      = get_env("Username", "User")
+Assistantname = get_env("Assistantname", "SmartVoice")
 DefaultMessage = f'''{Username} : Hello {Assistantname}, How are you?
 {Assistantname} : Welcome {Username}. I am doing well. What can I assist you with?'''
 subprocesses = []
 Functions = ["open", "close", "play", "system", "content", "google search",
-             "youtube search", "youtube control"]
+             "youtube search", "youtube control", "reminder"]
 
 pattern_matcher = SimplePatternMatcher()
 COMPARISON_MODE = True
@@ -68,7 +74,7 @@ def ReadChatLogJson():
         with open(r'Data\ChatLog.json', 'r', encoding='utf-8') as file:
             return json.load(file)
     except json.JSONDecodeError:
-        print("⚠️ Chatlog.json corrupted. Resetting...")
+        print("[WARN] Chatlog.json corrupted. Resetting...")
         default_chatlog = [
             {"role": "user",      "content": "Hello."},
             {"role": "assistant", "content": "Hello, how can I assist you today?"}
@@ -116,12 +122,10 @@ def InitialExecution():
         ShowDefaultChatIfNotChats()
         ChatLogIntegration()
         ShowChatsOnGUI()
-        print("✅ Mamur Beta initialized successfully!")
-        print(f"🌐 Default language: {language_manager.get_current_language_name()}")
+        print("[OK] Mamur Beta initialized successfully!")
+        print(f"[Language] Default language: {language_manager.get_current_language_name()}")
     except Exception as e:
-        print(f"❌ Initialization error: {e}")
-
-InitialExecution()
+        print(f"[ERROR] Initialization error: {e}")
 
 def MainExecution():
 
@@ -134,22 +138,32 @@ def MainExecution():
     try:
         from Backend.YouTubeController import yt_controller
         yt_controller.duck_volume(duck_to=8)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"YouTube ducking skipped: {e}")
 
     # ── Listen — status shown in current language ─────────────────────────────
-    SetAssistantStatus(language_manager.get_status("listening"))
-    Query = SpeechRecognition()
-
-    # ── Restore YouTube volume AFTER query captured ───────────────────────────
     try:
-        from Backend.YouTubeController import yt_controller
-        yt_controller.restore_volume()
-    except Exception:
-        pass
+        SetAssistantStatus(language_manager.get_status("listening"))
+        Query = SpeechRecognition()
+    except SpeechRecognitionError as e:
+        error_message = str(e)
+        ShowTextToScreen(f"{Assistantname} : {error_message}")
+        SetAssistantStatus("Available...")
+        logger.log_interaction(
+            query="", decision=[], execution_time=time.time() - start_time,
+            apis_used=[], success=False, error_message=error_message
+        )
+        print(f"Speech recognition failed: {error_message}")
+        return False
+    finally:
+        try:
+            from Backend.YouTubeController import yt_controller
+            yt_controller.restore_volume()
+        except Exception as e:
+            print(f"YouTube volume restore skipped: {e}")
 
     # ── Log detected language ─────────────────────────────────────────────────
-    print(f"\n🌐 Language: {language_manager.get_current_language_name()} "
+    print(f"\n[Language] {language_manager.get_current_language_name()} "
           f"({language_manager.get_current_language().upper()})")
 
     ShowTextToScreen(f"{Username} : {Query}")
@@ -180,17 +194,17 @@ def MainExecution():
                 match_accuracy=decisions_match
             )
 
-            print(f"\n🔬 COMPARISON:")
+            print(f"\n[Comparison]")
             print(f"   Cohere:  {CohereDec} ({cohere_time:.3f}s)")
             print(f"   Pattern: {PatternDecision} ({pattern_time:.3f}s)")
-            print(f"   Match:   {'✅' if decisions_match else '❌'}")
+            print(f"   Match:   {'yes' if decisions_match else 'no'}")
             if pattern_time > 0.0001:
                 print(f"   Speedup: {cohere_time/pattern_time:.1f}x faster with Pattern\n")
             else:
                 print(f"   Pattern was instant (< 0.0001s)\n")
 
         except Exception as e:
-            print(f"⚠️ Comparison mode error: {e}")
+            print(f"[WARN] Comparison mode error: {e}")
             decision_start = time.time()
             Decision       = FirstlayerDMM(Query)
             decision_time  = time.time() - decision_start
@@ -213,6 +227,7 @@ def MainExecution():
     response_start = time.time()
     success        = True
     error_message  = None
+    automation_feedback = []
 
     try:
         for queries in Decision:
@@ -224,15 +239,20 @@ def MainExecution():
         for queries in Decision:
             if not TaskExecution:
                 if any(func in queries for func in Functions):
-                    run(Automation(list(Decision)))
+                    automation_feedback = run(Automation(list(Decision)))
                     TaskExecution = True
+                    if automation_feedback and not (G or R):
+                        ShowTextToScreen(
+                            f"{Assistantname} : {' '.join(automation_feedback)}"
+                        )
 
         if ImageExecution:
-            with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
-                file.write(f"{ImageGenerationQuery},True")
             try:
+                require_env("HuggingFaceAPIKey")
+                with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
+                    file.write(f"{ImageGenerationQuery},True")
                 p1 = subprocess.Popen(
-                    ['python', r'Backend\ImageGeneration.py'],
+                    [sys.executable, r'Backend\ImageGeneration.py'],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     stdin=subprocess.PIPE, shell=False
                 )
@@ -241,6 +261,7 @@ def MainExecution():
                 print(f"Error starting ImageGeneration.py: {e}")
                 success       = False
                 error_message = str(e)
+                ShowTextToScreen(f"{Assistantname} : {error_message}")
 
         if G and R:
             SetAssistantStatus(language_manager.get_status("searching"))
@@ -344,6 +365,18 @@ def MainExecution():
                     TextToSpeech(msg)
                     return True
 
+            if TaskExecution and not (G or R):
+                total_time = time.time() - start_time
+                logger.log_interaction(
+                    query=Query, decision=Decision,
+                    execution_time=total_time, apis_used=apis_used,
+                    success=success, error_message=error_message,
+                    decision_time=decision_time,
+                    response_generation_time=time.time() - response_start,
+                    tts_time=0
+                )
+                return True
+
     except Exception as e:
         success       = False
         error_message = str(e)
@@ -355,13 +388,14 @@ def MainExecution():
             decision_time=decision_time,
             response_generation_time=0, tts_time=0
         )
-        print(f"❌ Error in MainExecution: {e}")
+        print(f"[ERROR] Error in MainExecution: {e}")
         import traceback
         traceback.print_exc()
 
 def FirstThread():
     while True:
         try:
+            HandleDueReminders()
             CurrentStatus = GetMicrophoneStatus()
             if CurrentStatus == "True":
                 MainExecution()
@@ -372,13 +406,28 @@ def FirstThread():
                 else:
                     SetAssistantStatus("Available...")
         except Exception as e:
-            print(f"❌ Thread error: {e}")
+            print(f"[ERROR] Thread error: {e}")
             sleep(1)
 
 def SecondThread():
     GraphicalUserInterface()
 
+def HandleDueReminders():
+    try:
+        due_reminders = pop_due_reminders()
+    except Exception as e:
+        print(f"Reminder check failed: {e}")
+        return
+
+    for reminder in due_reminders:
+        message = reminder.get("message", "your reminder")
+        alert = f"Reminder: {message}"
+        ShowTextToScreen(f"{Assistantname} : {alert}")
+        SetAssistantStatus("Reminder...")
+        TextToSpeech(alert)
+
 if __name__ == "__main__":
+    InitialExecution()
     thread2 = threading.Thread(target=FirstThread, daemon=True)
     thread2.start()
     SecondThread()

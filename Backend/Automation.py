@@ -1,22 +1,17 @@
 # Import required libraries
 from AppOpener import close, open as appopen
 from webbrowser import open as webopen
-from pywhatkit import search, playonyt
-from dotenv import dotenv_values
 from bs4 import BeautifulSoup
 from rich import print
 from groq import Groq
+from Backend.Config import get_env, require_env
+from Backend.ReminderManager import ReminderParseError, create_reminder
 import webbrowser
 import subprocess
 import requests
 import keyboard
 import asyncio
-import os
 from ddgs import DDGS
-
-# Load environment variables from the .env file.
-env_vars = dotenv_values(".env")
-GroqAPIKey = env_vars.get("GroqAPIKey") # Retrieve the Groq API key.
 
 # Define CSS classes for parsing specific elements in HTML content.
 classes = ["zCubwf", "hgKElc", "LTKOO sY7ric", "Z0LcW", "gsrt vk_bk FzvWSb YwPhnf", "pclqee", 
@@ -28,8 +23,14 @@ classes = ["zCubwf", "hgKElc", "LTKOO sY7ric", "Z0LcW", "gsrt vk_bk FzvWSb YwPhn
 # Define a user-agent for making web requests.
 useragent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36'
 
-# Initialize the Groq client with the API key.
-client = Groq(api_key=GroqAPIKey)
+client = None
+
+
+def _get_groq_client():
+    global client
+    if client is None:
+        client = Groq(api_key=require_env("GroqAPIKey"))
+    return client
 
 # Predefined professional responses for user interactions.
 professional_responses = [
@@ -41,12 +42,18 @@ professional_responses = [
 messages = []
 
 # System message to provide context to the chatbot.
-SystemChatBot = [{"role": "system", "content": f"Hello, I am {os.environ['Username']}, You're a content writer. You have to write content like lette"}]
+Username = get_env("Username", "User")
+SystemChatBot = [{"role": "system", "content": f"Hello, I am {Username}, You're a content writer. You have to write content clearly and professionally."}]
 
 # Function to perform a Google search.
 def GoogleSearch(Topic):
-    search(Topic) # Use pywhatkit's search function to perform a Google search.
-    return True # Indicate success.
+    try:
+        from pywhatkit import search
+        search(Topic) # Use pywhatkit's search function to perform a Google search.
+        return True # Indicate success.
+    except Exception as e:
+        print(f"Google search failed: {e}")
+        return False
 
 # Function to generate content using AI and save it to a file.
 def Content(Topic):
@@ -60,7 +67,7 @@ def Content(Topic):
     def ContentWriterAI(prompt):
         messages.append({"role": "user", "content": f"{prompt}"}) # Add the user's prompt to messages.
         
-        completion = client.chat.completions.create(
+        completion = _get_groq_client().chat.completions.create(
             model="llama-3.3-70b-versatile", # Specify the AI model.
             messages=SystemChatBot + messages, # Include system instructions and chat history.
             max_tokens=2048, # Limit the maximum tokens in the response.
@@ -101,8 +108,25 @@ def YouTubeSearch(Topic):
 
 # Function to play a video on YouTube.
 def PlayYoutube(query):
-    playonyt(query) # Use pywhatkit's playonyt function to play the video.
-    return True # Indicate success.
+    try:
+        from Backend.YouTubeController import yt_controller
+        return yt_controller.launch(query)
+    except ImportError:
+        print("[Automation] YouTubeController not found in Backend folder.")
+        return "YouTube controller module is missing."
+    except Exception as e:
+        print(f"YouTube playback failed: {e}")
+        return f"YouTube playback failed: {str(e)[:80]}"
+
+
+def SetReminder(command):
+    try:
+        return create_reminder(command)
+    except ReminderParseError as e:
+        return f"Could not set reminder: {e}"
+    except Exception as e:
+        print(f"Reminder failed: {e}")
+        return f"Reminder failed: {str(e)[:80]}"
 
 # Function to handle YouTube player control commands.
 # Runs synchronously inside asyncio.to_thread so it doesn't block the event loop.
@@ -274,7 +298,7 @@ def CloseApp(app):
         try:
             close(app, match_closest=True, output=True, throw_error=True) # Attempt to close the app.
             return True # Indicate success.
-        except:
+        except Exception:
             return False # Indicate failure.
 
 # Function to execute system-level commands.
@@ -360,25 +384,33 @@ async def TranslateAndExecute(commands: list[str]):
         elif command.startswith("youtube control "): # Handle YouTube player control commands.
             fun = asyncio.to_thread(YouTubeControl, command.removeprefix("youtube control ")) # Schedule YouTube control.
             funcs.append(fun)
+
+        elif command.startswith("reminder "): # Handle reminder commands.
+            fun = asyncio.to_thread(SetReminder, command.removeprefix("reminder ")) # Schedule reminder creation.
+            funcs.append(fun)
             
         else:
             print(f"No Function Found. For {command}") # Print an error for unrecognized commands.
             
-    results = await asyncio.gather(*funcs) # Execute all tasks concurrently.
+    results = await asyncio.gather(*funcs, return_exceptions=True) # Execute all tasks concurrently.
     
     for result in results: # Process the results.
-        if isinstance(result, str):
+        if isinstance(result, Exception):
+            yield f"Automation failed: {str(result)[:120]}"
+        elif isinstance(result, str):
             yield result
         else:
             yield result
 
 # Asynchronous function to automate command execution.
 async def Automation(commands: list[str]):
+    feedback = []
 
     async for result in TranslateAndExecute(commands): # Translate and execute commands.
-        pass
+        if isinstance(result, str) and result.strip():
+            feedback.append(result.strip())
         
-    return True # Indicate success.
+    return feedback
 
 # if __name__ == "__main__":
 #     asyncio.run(Automation(["open facebook", "open instagram", "open telegram", "play Gibran Idea 10", "content song for me"]))

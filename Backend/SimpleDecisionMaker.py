@@ -3,6 +3,9 @@ Simple pattern-based decision maker (baseline for comparison)
 Fast but less intelligent than Cohere-based system
 """
 
+import re
+
+
 class SimplePatternMatcher:
     """
     Baseline decision maker using keyword matching.
@@ -34,9 +37,119 @@ class SimplePatternMatcher:
             'generate image', 'create image', 'make image',
             'draw', 'picture of', 'image of'
         ]
-        
+
+        self.reminder_keywords = [
+            'remind me', 'set a reminder', 'reminder'
+        ]
+
         self.exit_keywords = ['bye', 'goodbye', 'exit', 'quit', 'see you']
-        
+
+    def _youtube_control_action(self, query_lower: str) -> str | None:
+        """
+        Return the YouTube controller action for obvious media-control commands.
+        Kept conservative so generic system commands like "mute my laptop" still
+        stay with the system automation path.
+        """
+        query_norm = " ".join(query_lower.replace("-", " ").split())
+        has_video_context = any(
+            keyword in query_norm
+            for keyword in ["youtube", "video", "captions", "caption", "subtitle"]
+        )
+
+        if any(phrase in query_norm for phrase in ["close youtube", "quit youtube", "exit youtube"]):
+            return "close youtube"
+
+        if any(phrase in query_norm for phrase in ["what is playing", "what's playing", "current video", "youtube status"]):
+            return "status"
+
+        if "sleep timer" in query_norm or "pause after" in query_norm or "stop after" in query_norm:
+            match = re.search(r"\d+(?:\.\d+)?", query_norm)
+            return f"sleep timer {match.group(0)}" if match else "sleep timer"
+
+        if any(phrase in query_norm for phrase in [
+            "cancel timer", "cancel the timer",
+            "stop timer", "stop the timer",
+            "clear timer", "clear the timer",
+            "remove timer", "remove the timer",
+        ]):
+            return "cancel timer"
+
+        if "skip forward" in query_norm or "fast forward" in query_norm:
+            match = re.search(r"\d+", query_norm)
+            return f"skip forward {match.group(0)}" if match else "skip forward"
+
+        if "skip back" in query_norm or "skip backward" in query_norm or "rewind" in query_norm:
+            match = re.search(r"\d+", query_norm)
+            return f"skip backward {match.group(0)}" if match else "skip backward"
+
+        if any(phrase in query_norm for phrase in ["next video", "next song", "next track", "skip video"]):
+            return "next video"
+
+        if any(phrase in query_norm for phrase in ["previous video", "previous song", "previous track"]):
+            return "previous"
+
+        if any(phrase in query_norm for phrase in ["start over", "restart video", "replay video"]):
+            return "previous"
+
+        if any(phrase in query_norm for phrase in ["normal speed", "slow down", "speed up", "playback rate"]):
+            if "normal speed" in query_norm:
+                return "normal speed"
+            if "slow down" in query_norm:
+                return "slow down"
+            if "speed up" in query_norm:
+                return "speed up"
+            match = re.search(r"\d+(?:\.\d+)?", query_norm)
+            return f"speed {match.group(0)}" if match else "speed"
+
+        if "speed" in query_norm and (has_video_context or re.search(r"\bspeed\s+(?:to\s+)?\d", query_norm)):
+            match = re.search(r"\d+(?:\.\d+)?", query_norm)
+            return f"speed {match.group(0)}" if match else "speed"
+
+        if any(phrase in query_norm for phrase in ["fullscreen", "full screen", "exit full"]):
+            return "fullscreen"
+
+        if any(word in query_norm for word in ["captions", "caption", "subtitle", "subtitles", "cc"]):
+            return "captions"
+
+        if any(phrase in query_norm for phrase in ["theater mode", "theatre mode", "cinema mode"]):
+            return "theater"
+
+        if "ambient" in query_norm:
+            return "ambient"
+
+        if "autoplay" in query_norm or "auto play" in query_norm:
+            return "autoplay"
+
+        if "volume" in query_norm and has_video_context:
+            match = re.search(r"\d+", query_norm)
+            if match:
+                return f"volume {match.group(0)}"
+            if any(word in query_norm for word in ["up", "louder", "increase"]):
+                return "volume up"
+            if any(word in query_norm for word in ["down", "quieter", "decrease", "lower"]):
+                return "volume down"
+            return "volume"
+
+        if any(word in query_norm for word in ["mute", "unmute", "silence"]) and has_video_context:
+            return "mute" if "unmute" not in query_norm else "unmute"
+
+        if any(phrase in query_norm for phrase in ["pause the video", "pause video", "stop the video", "stop video"]):
+            return "pause"
+
+        if any(phrase in query_norm for phrase in ["resume the video", "resume video", "continue the video", "unpause", "start video"]):
+            return "resume"
+
+        if has_video_context and re.search(r"\b(pause|stop)\b", query_norm):
+            return "pause"
+
+        if has_video_context and re.search(r"\b(resume|continue|unpause)\b", query_norm):
+            return "resume"
+
+        if has_video_context and query_norm in {"pause", "resume", "fullscreen", "mute", "unmute"}:
+            return query_norm
+
+        return None
+
     def decide(self, query: str) -> list:
         """
         Classify query using simple pattern matching.
@@ -49,11 +162,17 @@ class SimplePatternMatcher:
         """
         query_lower = query.lower().strip()
         decisions = []
-        
+
+        youtube_action = self._youtube_control_action(query_lower)
+        if youtube_action:
+            return [f"youtube control {youtube_action}"]
+
         # Check for exit
         if any(keyword in query_lower for keyword in self.exit_keywords):
             decisions.append('exit')
             return decisions
+
+        automation_found = False
         
         # Check for image generation
         if any(keyword in query_lower for keyword in self.image_keywords):
@@ -64,10 +183,17 @@ class SimplePatternMatcher:
                     if prompt:
                         decisions.append(f"generate image {prompt}")
                     break
+
+        # Check for reminders
+        for keyword in self.reminder_keywords:
+            if keyword in query_lower:
+                payload = query_lower.split(keyword, 1)[-1].strip()
+                if payload:
+                    decisions.append(f"reminder {payload}")
+                    automation_found = True
+                break
         
         # Check for automation tasks
-        automation_found = False
-        
         # Check for 'open' command
         if any(keyword in query_lower for keyword in self.automation_keywords['open']):
             parts = query_lower.split('open')

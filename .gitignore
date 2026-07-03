@@ -149,6 +149,7 @@ activemq-data/
 
 # Environments
 .env
+!.env.example
 .envrc
 .venv
 env/
@@ -216,3 +217,18 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# SmartVoice runtime/generated files
+Data/Chatlog.json
+Data/reminders.json
+Data/Voice.html
+Data/performance_log.json
+Data/comparison_log.json
+Data/statistics_for_paper.txt
+Data/comparison_for_paper.txt
+Data/*.mp3
+Data/*.jpg
+Data/*.jpeg
+Data/*.png
+Data/*.txt
+Frontend/Files/*.data

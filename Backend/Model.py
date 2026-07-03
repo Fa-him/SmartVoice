@@ -1,15 +1,8 @@
 import cohere
 from rich import print
-from dotenv import dotenv_values
+from Backend.Config import require_env
 
-# Load environment variables from the .env file.
-env_vars = dotenv_values(".env")
-
-# Retrieve API key.
-CohereAPIKey = env_vars.get("CohereAPIKey")
-
-# Create a Cohere client using the provided API key.
-co = cohere.Client(api_key=CohereAPIKey)
+co = cohere.Client(api_key=require_env("CohereAPIKey"))
 
 # Define a list of recognized function keywords for task categorization.
 funcs = [
@@ -96,12 +89,10 @@ def FirstlayerDMM(prompt: str = "test"):
     # Update the response with the filtered list    model='command-r-plus',    model='command-r-plus', of tasks
     response = temp
 
-    # If '(query)' is in the response, recursively call the function for future clarification
-    if "(query)" in response:
-        newresponse = FirstlayerDMM(prompt=prompt)
-        return newresponse  # Return the clarified response.
-    else:
-        return response  # Return the filtered response.
+    if not response or any("(query)" in task for task in response):
+        return [f"general {prompt}"]
+
+    return response  # Return the filtered response.
 
 # Entry point for the script.
 if __name__ == "__main__":

@@ -5,9 +5,12 @@ python-dotenv~=1.1.1
 # --- AI & Search Engines ---
 groq~=0.31.1
 cohere~=5.18.0
+ddgs
 duckduckgo_search
+googlesearch-python
 requests
 beautifulsoup4
+huggingface_hub~=1.3.2
 
 # --- Automation & System Control ---
 AppOpener
@@ -20,10 +23,11 @@ screen-brightness-control
 
 # --- Audio & Speech (STT/TTS) ---
 pygame
-edge-tts
+edge-tts~=7.2.3
 selenium
 webdriver-manager
 mtranslate
+langdetect
 
 # --- Utilities & Data Handling ---
 rich~=14.1.0

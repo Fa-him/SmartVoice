@@ -1,15 +1,12 @@
 from groq import Groq
-from json import load, dump
+from json import JSONDecodeError, load, dump
 import datetime
-from dotenv import dotenv_values
+from Backend.Config import get_env, require_env
 from .LanguageManager import language_manager
 
-env_vars      = dotenv_values(".env")
-Username      = env_vars.get("Username")
-Assistantname = env_vars.get("Assistantname")
-GroqAPIKey    = env_vars.get("GroqAPIKey")
-
-client   = Groq(api_key=GroqAPIKey)
+Username      = get_env("Username", "User")
+Assistantname = get_env("Assistantname", "SmartVoice")
+client        = Groq(api_key=require_env("GroqAPIKey"))
 messages = []
 
 # Base system prompt — NO hardcoded language restriction here.
@@ -21,12 +18,22 @@ You have real-time up-to-date information from the internet and can perform task
 *** Do not provide notes in the output. Never mention your training data. ***
 """
 
-try:
-    with open(r"Data\Chatlog.json", "r") as f:
-        messages = load(f)
-except FileNotFoundError:
+def _load_messages():
+    try:
+        with open(r"Data\Chatlog.json", "r") as f:
+            return load(f)
+    except (FileNotFoundError, JSONDecodeError):
+        with open(r"Data\Chatlog.json", "w") as f:
+            dump([], f)
+        return []
+
+
+def _save_messages(chat_messages):
     with open(r"Data\Chatlog.json", "w") as f:
-        dump([], f)
+        dump(chat_messages, f, indent=4)
+
+
+messages = _load_messages()
 
 def RealtimeInformation():
     now  = datetime.datetime.now()
@@ -62,8 +69,7 @@ def ChatBot(Query):
     Automatically replies in Bangla or English based on detected language.
     """
     try:
-        with open(r"Data\Chatlog.json", "r") as f:
-            messages = load(f)
+        messages = _load_messages()
 
         messages.append({"role": "user", "content": f"{Query}"})
 
@@ -91,16 +97,16 @@ def ChatBot(Query):
         Answer = Answer.replace("</s>", "")
         messages.append({"role": "assistant", "content": Answer})
 
-        with open(r"Data\Chatlog.json", "w") as f:
-            dump(messages, f, indent=4)
+        _save_messages(messages)
 
         return AnswerModifier(Answer)
 
     except Exception as e:
         print(f"Error in ChatBot: {e}")
-        with open(r"Data\Chatlog.json", "w") as f:
-            dump([], f, indent=4)
-        return ChatBot(Query)
+        return (
+            "Sorry, I could not reach the chat service right now. "
+            "Please check the Groq API key and network connection."
+        )
 
 if __name__ == "__main__":
     while True:
