@@ -1,3 +1,10 @@
+import sys
+
+from Backend.SetupWizard import ensure_user_config
+
+if __name__ == "__main__" and not ensure_user_config():
+    sys.exit(0)
+
 from PyQt5.QtWidgets import QApplication
 from Frontend.GUI import (
     GraphicalUserInterface,
@@ -28,7 +35,6 @@ import subprocess
 import threading
 import json
 import time
-import sys
 
 try:
     sys.stdout.reconfigure(errors="replace")

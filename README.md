@@ -29,10 +29,11 @@ python -m venv .venv
 .\.venv\Scripts\activate
 python -m pip install --upgrade pip
 python -m pip install -r Requirements.txt
-Copy-Item .env.example .env
 ```
 
-Then edit `.env` and add your real API keys and preferred assistant names.
+On first run, SmartVoice opens a setup window and asks for the user's name, assistant name, API keys, image settings, and speech-recognition options. It saves those values locally in `.env`, so each installed user can use their own API keys without editing files manually.
+
+For developer setup, you can still copy `.env.example` to `.env` and edit it by hand. If `.env` is missing or still contains placeholder keys like `your_groq_api_key`, the setup window appears automatically.
 
 Speech recognition uses Chrome through Selenium. For real microphone input, keep `SpeechRecognitionHeadless=False` and `SpeechRecognitionUseFakeMic=False` in `.env`.
 
@@ -44,6 +45,10 @@ Image generation uses Hugging Face Inference Providers through `huggingface_hub`
 .\.venv\Scripts\activate
 python main.py
 ```
+
+## Production-Style Use
+
+SmartVoice is ready for a first-run configuration flow: package the app, ship it without `.env`, and let each customer enter their own API keys during the first launch. The generated `.env` stays on that customer's machine and is ignored by git.
 
 ## Tests
 

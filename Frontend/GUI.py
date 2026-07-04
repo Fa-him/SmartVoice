@@ -2,14 +2,18 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QStackedWidget
 from PyQt5.QtGui import QIcon, QPainter, QMovie, QColor, QTextCharFormat, QFont, QPixmap, QTextBlockFormat
 from PyQt5.QtCore import Qt, QSize, QTimer
 from Backend.Config import ROOT_DIR, get_env
+from html import escape
 import sys
 import os
 import shutil
 
 Assistantname = get_env("Assistantname", "SmartVoice")
+Username = get_env("Username", "User")
 old_chat_message = ""
 TempDirPath = str(ROOT_DIR / "Frontend" / "Files")
 GraphicsDirPath = str(ROOT_DIR / "Frontend" / "Graphics")
+ASSISTANT_NAME_COLOR = "#63d3ff"
+USER_NAME_COLOR = "#ffd166"
 
 DEFAULT_TEMP_FILES = {
     "Mic.data": "False",
@@ -308,7 +312,8 @@ class ChatSection(QWidget):
             self.addCopyableArtifact(message)
             return
 
-        label = QLabel(message)
+        label = QLabel(self.formatChatMessage(message))
+        label.setTextFormat(Qt.RichText)
         label.setWordWrap(True)
         label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         label.setStyleSheet(
@@ -337,6 +342,31 @@ class ChatSection(QWidget):
     def scrollToBottom(self):
         scrollbar = self.chat_scroll.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
+
+    def formatChatMessage(self, message):
+        return "<br>".join(self.formatChatLine(line) for line in message.splitlines())
+
+    def formatChatLine(self, line):
+        speaker_styles = [
+            (Assistantname, ASSISTANT_NAME_COLOR),
+            (Username, USER_NAME_COLOR),
+            ("SmartVoice", ASSISTANT_NAME_COLOR),
+            ("Assistant", ASSISTANT_NAME_COLOR),
+            ("User", USER_NAME_COLOR),
+        ]
+
+        for speaker, color in speaker_styles:
+            prefix = f"{speaker} :"
+            if line.startswith(prefix):
+                body = line[len(prefix):].strip()
+                return (
+                    f'<span style="color:{color}; font-weight:700;">'
+                    f'{escape(speaker)}</span>'
+                    f'<span style="color:#bdbdbd;"> :</span> '
+                    f'<span style="color:#ffffff;">{escape(body)}</span>'
+                )
+
+        return escape(line)
 
     def assistantBody(self, message):
         prefix = f"{Assistantname} :"
@@ -385,8 +415,14 @@ class ChatSection(QWidget):
         frame_layout.setSpacing(8)
 
         header_layout = QHBoxLayout()
-        title_label = QLabel(title)
-        title_label.setStyleSheet("color: white; font-size:14px; font-weight: bold; border: none;")
+        title_label = QLabel(
+            f'<span style="color:{ASSISTANT_NAME_COLOR}; font-weight:700;">'
+            f'{escape(Assistantname)}</span>'
+            f'<span style="color:#bdbdbd;"> / </span>'
+            f'<span style="color:white; font-weight:700;">{escape(title)}</span>'
+        )
+        title_label.setTextFormat(Qt.RichText)
+        title_label.setStyleSheet("font-size:14px; border: none;")
         copy_button = QPushButton("Copy")
         copy_button.setStyleSheet(
             "background-color:white; color:black; padding:6px 12px; border-radius:6px;"
@@ -429,6 +465,14 @@ class ChatSection(QWidget):
         frame_layout.setSpacing(8)
 
         max_width = 520
+        image_title = QLabel(
+            f'<span style="color:{ASSISTANT_NAME_COLOR}; font-weight:700;">'
+            f'{escape(Assistantname)}</span>'
+            f'<span style="color:#bdbdbd;"> / </span>'
+            f'<span style="color:white; font-weight:700;">Image</span>'
+        )
+        image_title.setTextFormat(Qt.RichText)
+        image_title.setStyleSheet("font-size:14px; border: none;")
         preview = QLabel()
         preview.setAlignment(Qt.AlignCenter)
         preview.setStyleSheet("border: none; background-color: #050505;")
@@ -448,6 +492,7 @@ class ChatSection(QWidget):
         button_layout.addWidget(copy_button)
         button_layout.addWidget(download_button)
 
+        frame_layout.addWidget(image_title)
         frame_layout.addWidget(preview)
         frame_layout.addLayout(button_layout)
         self.appendChatWidget(frame)
@@ -748,7 +793,7 @@ class MainWindow(QMainWindow):
 
 def GraphicalUserInterface():
     SetMicInactive()
-    app = QApplication(sys.argv)
+    app = QApplication.instance() or QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
