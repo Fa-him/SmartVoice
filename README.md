@@ -50,6 +50,30 @@ python main.py
 
 SmartVoice is ready for a first-run configuration flow: package the app, ship it without `.env`, and let each customer enter their own API keys during the first launch. The generated `.env` stays on that customer's machine and is ignored by git.
 
+## Build Windows Release
+
+Install build tooling once:
+
+```powershell
+.\tools\build_windows.ps1 -InstallBuildDeps
+```
+
+Build the app:
+
+```powershell
+.\tools\build_windows.ps1
+```
+
+The executable folder is created at `dist\SmartVoice`.
+
+To build a customer installer, install Inno Setup 6 and run:
+
+```powershell
+.\tools\build_installer.ps1
+```
+
+The installer is created under `dist\installer`. It installs per user under LocalAppData, creates writable `Data` and `Frontend\Files` folders, and launches the first-run setup wizard when `.env` is missing.
+
 ## Tests
 
 ```powershell

@@ -1,10 +1,26 @@
 import os
+import sys
 from pathlib import Path
 
 from dotenv import dotenv_values
 
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+def _resolve_app_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parents[1]
+
+
+def _resolve_resource_dir() -> Path:
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return Path(sys._MEIPASS).resolve()
+    return ROOT_DIR
+
+
+ROOT_DIR = _resolve_app_dir()
+RESOURCE_DIR = _resolve_resource_dir()
+DATA_DIR = ROOT_DIR / "Data"
+FRONTEND_FILES_DIR = ROOT_DIR / "Frontend" / "Files"
 ENV_PATH = ROOT_DIR / ".env"
 _ENV_VALUES = dotenv_values(ENV_PATH)
 
@@ -35,6 +51,11 @@ PLACEHOLDER_VALUES = {
 
 class ConfigError(RuntimeError):
     """Raised when required SmartVoice configuration is missing."""
+
+
+def ensure_runtime_dirs() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    FRONTEND_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def reload_env() -> dict[str, str | None]:
@@ -88,3 +109,6 @@ def missing_config_keys(required_keys=SETUP_REQUIRED_CONFIG_KEYS) -> list[str]:
 
 def config_needs_setup(required_keys=SETUP_REQUIRED_CONFIG_KEYS) -> bool:
     return bool(missing_config_keys(required_keys))
+
+
+ensure_runtime_dirs()

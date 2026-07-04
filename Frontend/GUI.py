@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QStackedWidget, QWidget, QLineEdit, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QFrame, QLabel, QSizePolicy, QScrollArea, QFileDialog
 from PyQt5.QtGui import QIcon, QPainter, QMovie, QColor, QTextCharFormat, QFont, QPixmap, QTextBlockFormat
 from PyQt5.QtCore import Qt, QSize, QTimer
-from Backend.Config import ROOT_DIR, get_env
+from Backend.Config import RESOURCE_DIR, ROOT_DIR, get_env
 from html import escape
 import sys
 import os
@@ -11,7 +11,7 @@ Assistantname = get_env("Assistantname", "SmartVoice")
 Username = get_env("Username", "User")
 old_chat_message = ""
 TempDirPath = str(ROOT_DIR / "Frontend" / "Files")
-GraphicsDirPath = str(ROOT_DIR / "Frontend" / "Graphics")
+GraphicsDirPath = str(RESOURCE_DIR / "Frontend" / "Graphics")
 ASSISTANT_NAME_COLOR = "#63d3ff"
 USER_NAME_COLOR = "#ffd166"
 

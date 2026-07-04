@@ -31,7 +31,6 @@ from Backend.Config import get_env, require_env
 from Backend.ReminderManager import pop_due_reminders
 from asyncio import run
 from time import sleep
-import subprocess
 import threading
 import json
 import time
@@ -46,7 +45,6 @@ Username      = get_env("Username", "User")
 Assistantname = get_env("Assistantname", "SmartVoice")
 DefaultMessage = f'''{Username} : Hello {Assistantname}, How are you?
 {Assistantname} : Welcome {Username}. I am doing well. What can I assist you with?'''
-subprocesses = []
 Functions = ["open", "close", "play", "system", "google search",
              "youtube search", "youtube control", "reminder"]
 
@@ -313,21 +311,7 @@ def MainExecution():
             try:
                 require_env("HuggingFaceAPIKey")
                 ImagePrompt = ImagePromptFromDecision(ImageGenerationQuery)
-                with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
-                    file.write(f"{ImagePrompt},True")
-                ShowTextToScreen(f"{Assistantname} : Generating image for: {ImagePrompt}")
-                p1 = subprocess.Popen(
-                    [sys.executable, "-m", "Backend.ImageGeneration"],
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                    stdin=subprocess.DEVNULL, shell=False,
-                    text=True, encoding="utf-8", errors="replace"
-                )
-                subprocesses.append(p1)
-                threading.Thread(
-                    target=WatchImageGenerationProcess,
-                    args=(p1,),
-                    daemon=True
-                ).start()
+                StartImageGeneration(ImagePrompt)
             except Exception as e:
                 print(f"Error starting ImageGeneration.py: {e}")
                 success       = False
@@ -522,20 +506,27 @@ def ImagePromptFromDecision(DecisionQuery):
             break
     return Prompt or DecisionQuery.strip()
 
-def WatchImageGenerationProcess(Process):
-    stdout, stderr = Process.communicate()
+def StartImageGeneration(ImagePrompt):
+    ShowTextToScreen(f"{Assistantname} : Generating image for: {ImagePrompt}")
+    SetAssistantStatus("Generating image...")
+    threading.Thread(
+        target=RunImageGenerationWorker,
+        args=(ImagePrompt,),
+        daemon=True,
+    ).start()
 
-    if stdout:
-        print(stdout, end="")
-    if stderr:
-        print(stderr, end="", file=sys.stderr)
+def RunImageGenerationWorker(ImagePrompt):
+    try:
+        from Backend.ImageGeneration import GenerateImages
 
-    if Process.returncode == 0:
+        GenerateImages(ImagePrompt)
         ShowTextToScreen(f"{Assistantname} : Image generated.")
-    else:
-        details = (stderr or stdout or "Unknown image generation error.").strip()
+    except Exception as e:
+        details = str(e) or "Unknown image generation error."
+        print(f"Image generation failed: {details}")
         ShowTextToScreen(f"{Assistantname} : Image generation failed: {details[-500:]}")
-    SetAssistantStatus("Available...")
+    finally:
+        SetAssistantStatus("Available...")
 
 def FirstThread():
     while True:
