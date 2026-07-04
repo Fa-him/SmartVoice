@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QStackedWidget, QWidget, QLineEdit, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QFrame, QLabel, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QStackedWidget, QWidget, QLineEdit, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QFrame, QLabel, QSizePolicy, QScrollArea, QFileDialog
 from PyQt5.QtGui import QIcon, QPainter, QMovie, QColor, QTextCharFormat, QFont, QPixmap, QTextBlockFormat
 from PyQt5.QtCore import Qt, QSize, QTimer
 from Backend.Config import ROOT_DIR, get_env
 import sys
 import os
+import shutil
 
 Assistantname = get_env("Assistantname", "SmartVoice")
 old_chat_message = ""
@@ -15,6 +16,8 @@ DEFAULT_TEMP_FILES = {
     "Status.data": "Available...",
     "Responses.data": "",
     "Database.data": "",
+    "TextQuery.data": "",
+    "GeneratedImages.data": "",
 }
 
 def EnsureTempFiles():
@@ -102,6 +105,41 @@ def TempDirectoryPath(Filename):
 def ShowTextToScreen(Text):
     WriteTempFile("Responses.data", Text)
 
+def SetTextQuery(Query):
+    WriteTempFile("TextQuery.data", Query.strip())
+
+def GetTextQuery():
+    return ReadTempFile("TextQuery.data", "")
+
+def ClearTextQuery():
+    WriteTempFile("TextQuery.data", "")
+
+def GetGeneratedImages():
+    return ReadTempFile("GeneratedImages.data", "")
+
+def ClearGeneratedImages():
+    WriteTempFile("GeneratedImages.data", "")
+
+def ChatLogFilePath():
+    data_dir = ROOT_DIR / "Data"
+    os.makedirs(data_dir, exist_ok=True)
+    for filename in ("ChatLog.json", "Chatlog.json"):
+        path = data_dir / filename
+        if path.exists():
+            return path
+    return data_dir / "ChatLog.json"
+
+def ClearPersistentChats():
+    global old_chat_message
+
+    with open(ChatLogFilePath(), "w", encoding="utf-8") as file:
+        file.write("[]")
+    WriteTempFile("Database.data", "")
+    WriteTempFile("Responses.data", "")
+    ClearGeneratedImages()
+    ClearTextQuery()
+    old_chat_message = ""
+
 EnsureTempFiles()
 
 class ChatSection(QWidget):
@@ -110,20 +148,23 @@ class ChatSection(QWidget):
         super(ChatSection, self).__init__()
         layout = QVBoxLayout(self)
         layout.setContentsMargins(-10, 40, 40, 100)
-        layout.setSpacing(-100)
-        self.chat_text_edit = QTextEdit()
-        self.chat_text_edit.setReadOnly(True)
-        self.chat_text_edit.setTextInteractionFlags(Qt.NoTextInteraction) # No text interaction
-        self.chat_text_edit.setFrameStyle(QFrame.NoFrame)
-        layout.addWidget(self.chat_text_edit)
+        layout.setSpacing(8)
+        self.chat_scroll = QScrollArea()
+        self.chat_scroll.setWidgetResizable(True)
+        self.chat_scroll.setFrameStyle(QFrame.NoFrame)
+        self.chat_scroll.setStyleSheet("background-color: black; border: none;")
+        self.messages_widget = QWidget()
+        self.messages_widget.setStyleSheet("background-color: black;")
+        self.messages_layout = QVBoxLayout(self.messages_widget)
+        self.messages_layout.setContentsMargins(20, 10, 20, 10)
+        self.messages_layout.setSpacing(12)
+        self.messages_layout.setAlignment(Qt.AlignTop)
+        self.chat_scroll.setWidget(self.messages_widget)
+        layout.addWidget(self.chat_scroll)
         self.setStyleSheet("background-color: black;")
         layout.setSizeConstraint(QVBoxLayout.SetDefaultConstraint)
         layout.setStretch(1, 1)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        text_color = QColor(Qt.blue)
-        text_color_text = QTextCharFormat()
-        text_color_text.setForeground(text_color)
-        self.chat_text_edit.setCurrentCharFormat(text_color_text)
         self.gif_label = QLabel()
         self.gif_label.setStyleSheet("border: none;")
         movie = QMovie(GraphicsDirectoryPath('Mamur_Beta.gif'))
@@ -138,16 +179,41 @@ class ChatSection(QWidget):
         self.label.setStyleSheet("color: white; font-size:16px; margin-right: 195px; border: none; margin-top: -30px;")
         self.label.setAlignment(Qt.AlignRight)
         layout.addWidget(self.label)
-        layout.setSpacing(-10)
+        self.chat_icon_label = QLabel()
+        chat_pixmap = QPixmap(GraphicsDirectoryPath('Chats.png'))
+        new_chat_pixmap = chat_pixmap.scaled(44, 44)
+        self.chat_icon_label.setPixmap(new_chat_pixmap)
+        self.chat_icon_label.setFixedSize(90, 60)
+        self.chat_icon_label.setAlignment(Qt.AlignCenter)
+        self.chat_icon_label.mousePressEvent = self.show_text_input
+        self.text_input = QLineEdit()
+        self.text_input.setPlaceholderText("Type a message...")
+        self.text_input.setFixedWidth(520)
+        self.text_input.setStyleSheet(
+            "background-color: white; color: black; font-size:16px; padding:10px; border-radius:8px;"
+        )
+        self.text_input.returnPressed.connect(self.submit_text_input)
+        self.text_input.hide()
+        self.clear_chat_button = QPushButton("Delete Chats")
+        self.clear_chat_button.setStyleSheet(
+            "background-color:#2b1010; color:white; font-size:14px; "
+            "padding:9px 12px; border-radius:8px; border:1px solid #6b2222;"
+        )
+        self.clear_chat_button.clicked.connect(self.clear_chats)
+        input_layout = QHBoxLayout()
+        input_layout.addStretch(1)
+        input_layout.addWidget(self.chat_icon_label)
+        input_layout.addWidget(self.text_input)
+        input_layout.addWidget(self.clear_chat_button)
+        input_layout.addStretch(1)
+        layout.addLayout(input_layout)
+        layout.setSpacing(8)
         layout.addWidget(self.gif_label)
-        font = QFont()
-        font.setPointSize(13)
-        self.chat_text_edit.setFont(font)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.loadMessages)
+        self.timer.timeout.connect(self.loadGeneratedImages)
         self.timer.timeout.connect(self.SpeechRecogText)
         self.timer.start(100)
-        self.chat_text_edit.viewport().installEventFilter(self)
         self.setStyleSheet("""
             QScrollBar:vertical {
                 border: none;
@@ -205,6 +271,17 @@ class ChatSection(QWidget):
             self.addMessage(message=messages,color='White')
             old_chat_message = messages
 
+    def loadGeneratedImages(self):
+        images = GetGeneratedImages().strip()
+        if not images:
+            return
+
+        ClearGeneratedImages()
+        for image_path in images.splitlines():
+            image_path = image_path.strip()
+            if image_path:
+                self.addImage(image_path)
+
     def SpeechRecogText(self):
         messages = ReadTempFile("Status.data", "Available...")
         self.label.setText(messages)
@@ -227,16 +304,200 @@ class ChatSection(QWidget):
         self.toggled = not self.toggled
 
     def addMessage(self, message, color):
-        cursor = self.chat_text_edit.textCursor()
-        format = QTextCharFormat()
-        formatm = QTextBlockFormat()
-        formatm.setTopMargin(10)
-        formatm.setLeftMargin(10)
-        format.setForeground(QColor(color))
-        cursor.setCharFormat(format)
-        cursor.setBlockFormat(formatm)
-        cursor.insertText(message + "\n")
-        self.chat_text_edit.setTextCursor(cursor)
+        if self.isCopyableArtifact(message):
+            self.addCopyableArtifact(message)
+            return
+
+        label = QLabel(message)
+        label.setWordWrap(True)
+        label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        label.setStyleSheet(
+            "color: white; background-color: #101010; font-size:15px; "
+            "padding:10px; border-radius:8px;"
+        )
+        self.appendChatWidget(label)
+
+    def appendChatWidget(self, widget):
+        self.messages_layout.addWidget(widget)
+        QTimer.singleShot(0, self.scrollToBottom)
+
+    def clearChatWidgets(self):
+        while self.messages_layout.count():
+            item = self.messages_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
+    def clear_chats(self):
+        ClearPersistentChats()
+        self.clearChatWidgets()
+        self.clear_chat_button.setText("Deleted")
+        QTimer.singleShot(1200, lambda: self.clear_chat_button.setText("Delete Chats"))
+
+    def scrollToBottom(self):
+        scrollbar = self.chat_scroll.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+    def assistantBody(self, message):
+        prefix = f"{Assistantname} :"
+        if message.startswith(prefix):
+            return message[len(prefix):].strip()
+        return message.strip()
+
+    def isCopyableArtifact(self, message):
+        if not message.startswith(f"{Assistantname} :"):
+            return False
+
+        body = self.assistantBody(message)
+        body_lower = body.lower()
+        code_markers = [
+            "```", "#include", "int main", "using namespace", "public static",
+            "def ", "class ", "function ", "import ", "console.log", "return ",
+        ]
+        doc_markers = [
+            "subject:", "dear ", "sincerely", "regards", "application",
+            "cover letter", "mail", "email", "letter", "resume", "cv",
+            "বিষয়", "বিষয়", "প্রিয়", "শুভেচ্ছা", "ইতি", "ধন্যবাদ",
+            "আবেদন", "ইমেইল", "মেইল", "চিঠি",
+        ]
+        return (
+            any(marker in body_lower for marker in code_markers)
+            or any(marker in body_lower for marker in doc_markers)
+            or body.count("\n") >= 4
+        )
+
+    def artifactTitle(self, body):
+        body_lower = body.lower()
+        if any(marker in body_lower for marker in ["```", "#include", "int main", "def ", "class ", "function "]):
+            return "Code"
+        return "Document"
+
+    def addCopyableArtifact(self, message):
+        body = self.assistantBody(message)
+        title = self.artifactTitle(body)
+
+        frame = QFrame()
+        frame.setStyleSheet(
+            "QFrame { background-color: #111111; border: 1px solid #333333; border-radius: 8px; }"
+        )
+        frame_layout = QVBoxLayout(frame)
+        frame_layout.setContentsMargins(10, 10, 10, 10)
+        frame_layout.setSpacing(8)
+
+        header_layout = QHBoxLayout()
+        title_label = QLabel(title)
+        title_label.setStyleSheet("color: white; font-size:14px; font-weight: bold; border: none;")
+        copy_button = QPushButton("Copy")
+        copy_button.setStyleSheet(
+            "background-color:white; color:black; padding:6px 12px; border-radius:6px;"
+        )
+        copy_button.clicked.connect(lambda: self.copyText(body, copy_button))
+        header_layout.addWidget(title_label)
+        header_layout.addStretch(1)
+        header_layout.addWidget(copy_button)
+
+        text_box = QTextEdit()
+        text_box.setReadOnly(True)
+        text_box.setPlainText(body)
+        text_box.setMinimumHeight(180)
+        text_box.setStyleSheet(
+            "background-color: #050505; color: white; font-size:14px; "
+            "padding:8px; border: 1px solid #2b2b2b; border-radius:6px;"
+        )
+
+        frame_layout.addLayout(header_layout)
+        frame_layout.addWidget(text_box)
+        self.appendChatWidget(frame)
+
+    def copyText(self, text, button):
+        QApplication.clipboard().setText(text)
+        button.setText("Copied")
+        QTimer.singleShot(1200, lambda: button.setText("Copy"))
+
+    def addImage(self, image_path):
+        pixmap = QPixmap(image_path)
+        if pixmap.isNull():
+            self.addMessage(f"{Assistantname} : Image saved, but could not load preview: {image_path}", "White")
+            return
+
+        frame = QFrame()
+        frame.setStyleSheet(
+            "QFrame { background-color: #111111; border: 1px solid #333333; border-radius: 8px; }"
+        )
+        frame_layout = QVBoxLayout(frame)
+        frame_layout.setContentsMargins(10, 10, 10, 10)
+        frame_layout.setSpacing(8)
+
+        max_width = 520
+        preview = QLabel()
+        preview.setAlignment(Qt.AlignCenter)
+        preview.setStyleSheet("border: none; background-color: #050505;")
+        preview_width = min(max_width, pixmap.width())
+        preview.setPixmap(pixmap.scaledToWidth(preview_width, Qt.SmoothTransformation))
+
+        button_layout = QHBoxLayout()
+        copy_button = QPushButton("Copy Image")
+        download_button = QPushButton("Download")
+        for button in (copy_button, download_button):
+            button.setStyleSheet(
+                "background-color:white; color:black; padding:6px 12px; border-radius:6px;"
+            )
+        copy_button.clicked.connect(lambda: self.copyImage(image_path, copy_button))
+        download_button.clicked.connect(lambda: self.downloadImage(image_path, download_button))
+        button_layout.addStretch(1)
+        button_layout.addWidget(copy_button)
+        button_layout.addWidget(download_button)
+
+        frame_layout.addWidget(preview)
+        frame_layout.addLayout(button_layout)
+        self.appendChatWidget(frame)
+
+    def copyImage(self, image_path, button):
+        pixmap = QPixmap(image_path)
+        if pixmap.isNull():
+            button.setText("Failed")
+            QTimer.singleShot(1200, lambda: button.setText("Copy Image"))
+            return
+
+        QApplication.clipboard().setPixmap(pixmap)
+        button.setText("Copied")
+        QTimer.singleShot(1200, lambda: button.setText("Copy Image"))
+
+    def downloadImage(self, image_path, button):
+        default_name = os.path.basename(image_path)
+        target_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Download image",
+            default_name,
+            "JPEG Images (*.jpg);;PNG Images (*.png);;All Files (*)"
+        )
+        if not target_path:
+            return
+
+        try:
+            if os.path.abspath(image_path) != os.path.abspath(target_path):
+                shutil.copyfile(image_path, target_path)
+            button.setText("Downloaded")
+        except Exception:
+            button.setText("Failed")
+        QTimer.singleShot(1200, lambda: button.setText("Download"))
+
+    def show_text_input(self, event=None):
+        self.chat_icon_label.hide()
+        self.text_input.show()
+        self.text_input.setFocus()
+
+    def submit_text_input(self):
+        query = self.text_input.text().strip()
+        if not query:
+            self.text_input.hide()
+            self.chat_icon_label.show()
+            return
+
+        SetTextQuery(query)
+        self.text_input.clear()
+        self.text_input.hide()
+        self.chat_icon_label.show()
 
 class InitialScreen(QWidget):
 
@@ -264,11 +525,28 @@ class InitialScreen(QWidget):
         self.mic_active = False
         SetMicInactive()
         self.icon_label.mousePressEvent = self.toggle_icon
+        self.chat_icon_label = QLabel()
+        chat_pixmap = QPixmap(GraphicsDirectoryPath('Chats.png'))
+        new_chat_pixmap = chat_pixmap.scaled(60, 60)
+        self.chat_icon_label.setPixmap(new_chat_pixmap)
+        self.chat_icon_label.setFixedSize(150,150)
+        self.chat_icon_label.setAlignment(Qt.AlignCenter)
+        self.chat_icon_label.mousePressEvent = self.show_text_input
+        self.text_input = QLineEdit()
+        self.text_input.setPlaceholderText("Type a message...")
+        self.text_input.setFixedWidth(420)
+        self.text_input.setStyleSheet(
+            "background-color: white; color: black; font-size:16px; padding:10px; border-radius:8px;"
+        )
+        self.text_input.returnPressed.connect(self.submit_text_input)
+        self.text_input.hide()
         self.label = QLabel("")
         self.label.setStyleSheet("color: white; font-size:16px ; margin-bottom:0;")
         content_layout.addWidget(gif_label, alignment=Qt.AlignCenter)
         content_layout.addWidget(self.label, alignment=Qt.AlignCenter)
         content_layout.addWidget(self.icon_label, alignment=Qt.AlignCenter)
+        content_layout.addWidget(self.chat_icon_label, alignment=Qt.AlignCenter)
+        content_layout.addWidget(self.text_input, alignment=Qt.AlignCenter)
         content_layout.setContentsMargins(0, 0, 0, 150)
         self.setLayout(content_layout)
         self.setFixedHeight(screen_height)
@@ -303,6 +581,23 @@ class InitialScreen(QWidget):
         else:
             self.load_icon(GraphicsDirectoryPath('Mic_off.png'), 60, 60)
             SetMicInactive()
+
+    def show_text_input(self, event=None):
+        self.chat_icon_label.hide()
+        self.text_input.show()
+        self.text_input.setFocus()
+
+    def submit_text_input(self):
+        query = self.text_input.text().strip()
+        if not query:
+            self.text_input.hide()
+            self.chat_icon_label.show()
+            return
+
+        SetTextQuery(query)
+        self.text_input.clear()
+        self.text_input.hide()
+        self.chat_icon_label.show()
 
 class MessageScreen(QWidget):
 

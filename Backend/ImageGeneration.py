@@ -1,11 +1,22 @@
 import asyncio
 from io import BytesIO
+from pathlib import Path
 from random import randint
+import re
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from PIL import Image
 from huggingface_hub import AsyncInferenceClient
-from Backend.Config import get_env, require_env
-import os
+from Backend.Config import ROOT_DIR, get_env, require_env
 from time import sleep
+
+DATA_DIR = ROOT_DIR / "Data"
+REQUEST_FILE = ROOT_DIR / "Frontend" / "Files" / "ImageGeneration.data"
+GENERATED_IMAGES_FILE = ROOT_DIR / "Frontend" / "Files" / "GeneratedImages.data"
 
 
 def _int_env(name: str, default: int) -> int:
@@ -21,33 +32,27 @@ def _float_env(name: str, default: float) -> float:
     except (TypeError, ValueError):
         return default
 
+def _image_stem(prompt: str) -> str:
+    stem = re.sub(r'[<>:"/\\|?*]+', "", prompt.strip())
+    stem = re.sub(r"\s+", "_", stem)
+    return stem or "generated_image"
 
-# Function to open and display images based on a given prompt
-def open_images(prompt):
-    folder_path = r"Data" # Folder where the images are stored
-    prompt = prompt.replace(" ", "_") # Replace spaces in prompt with underscores
 
-    # Generate the filenames for the images
-    Files = [f"{prompt}{i}.jpg" for i in range(1, IMAGES_PER_PROMPT + 1)]
+def publish_generated_images(image_paths):
+    GENERATED_IMAGES_FILE.parent.mkdir(parents=True, exist_ok=True)
+    existing = ""
+    if GENERATED_IMAGES_FILE.exists():
+        existing = GENERATED_IMAGES_FILE.read_text(encoding="utf-8").strip()
 
-    for jpg_file in Files:
-        image_path = os.path.join(folder_path, jpg_file)
-
-        try:
-            # Try to open and display the image
-            img = Image.open(image_path)
-            print(f"Opening image: {image_path}")
-            img.show()
-            sleep(1) # Pause for 1 second before showing the next image
-
-        except IOError:
-            print(f"Unable to open {image_path}")
+    pending_paths = [existing] if existing else []
+    pending_paths.extend(str(path) for path in image_paths)
+    GENERATED_IMAGES_FILE.write_text("\n".join(pending_paths), encoding="utf-8")
 
 # Hugging Face Inference Providers image settings.
 IMAGE_MODEL = get_env("HuggingFaceImageModel", "black-forest-labs/FLUX.1-schnell")
 IMAGE_PROVIDER = get_env("HuggingFaceProvider", "auto")
 IMAGE_TIMEOUT_SECONDS = _float_env("HuggingFaceImageTimeoutSeconds", 90)
-IMAGES_PER_PROMPT = max(1, _int_env("HuggingFaceImagesPerPrompt", 4))
+IMAGES_PER_PROMPT = max(1, _int_env("HuggingFaceImagesPerPrompt", 1))
 
 
 def _client() -> AsyncInferenceClient:
@@ -96,9 +101,9 @@ async def query(payload: dict) -> bytes:
 
 # Async function to generate images based on the given prompt
 async def generate_images(prompt: str):
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
     tasks = []
-    
-    # Create image generation tasks
+
     for _ in range(IMAGES_PER_PROMPT):
         payload = {
             "inputs": f"{prompt}, quality=4K, sharpness=maximum, Ultra High details, high resolution",
@@ -106,27 +111,44 @@ async def generate_images(prompt: str):
                 "seed": randint(0, 1000000),
             },
         }
-        task = asyncio.create_task(query(payload))
-        tasks.append(task)
-        
-    # Wait for all tasks to complete
-    image_bytes_list = await asyncio.gather(*tasks)
-    
-    # Save the generated images to files
-    for i, image_bytes in enumerate(image_bytes_list):
-        with open(fr"Data\{prompt.replace(' ', '_')}{i + 1}.jpg", "wb") as f:
-            f.write(image_bytes)
+        tasks.append(asyncio.create_task(query(payload)))
 
-# Wrapper function to generate and open images
+    image_results = await asyncio.gather(*tasks, return_exceptions=True)
+    saved_count = 0
+    saved_paths = []
+    errors = []
+
+    for image_number, result in enumerate(image_results, start=1):
+        if isinstance(result, Exception):
+            errors.append(f"image {image_number}: {result}")
+            print(f"Image {image_number} failed: {result}")
+            continue
+
+        image_path = DATA_DIR / f"{_image_stem(prompt)}{image_number}.jpg"
+        with open(image_path, "wb") as f:
+            f.write(result)
+        saved_count += 1
+        saved_paths.append(image_path)
+        print(f"Saved image: {image_path}")
+
+    if saved_count == 0:
+        raise RuntimeError("All image generation requests failed. " + " | ".join(errors))
+
+    if errors:
+        print(f"{len(errors)} image request(s) failed, but {saved_count} image(s) were saved.")
+
+    return saved_paths
+
+# Wrapper function to generate images and publish them to the GUI
 def GenerateImages(prompt: str):
-    asyncio.run(generate_images(prompt)) # Run the async image generation
-    open_images(prompt) # Open the generated images
+    image_paths = asyncio.run(generate_images(prompt)) # Run the async image generation
+    publish_generated_images(image_paths)
 
 def monitor_image_generation_requests():
     while True:
         try:
             # Read the status and prompt from the data file
-            with open(r"Frontend\Files\ImageGeneration.data", "r") as f:
+            with open(REQUEST_FILE, "r") as f:
                 Data = str(f.read())
             
             Prompt, Status = Data.rsplit(",", 1)
@@ -137,10 +159,10 @@ def monitor_image_generation_requests():
                 GenerateImages(prompt=Prompt)
 
                 # Reset the status in the file after generating images
-                with open(r"Frontend\Files\ImageGeneration.data", "w") as f:
+                with open(REQUEST_FILE, "w") as f:
                     f.write("False,False")
 
-                break # Exit the loop after processing the request
+                return True # Exit the loop after processing the request
 
             else:
                 sleep(1) # Wait for 1 second before checking again
@@ -153,12 +175,13 @@ def monitor_image_generation_requests():
         except Exception as e:
             print(f"Image generation failed: {e}")
             try:
-                with open(r"Frontend\Files\ImageGeneration.data", "w") as f:
+                REQUEST_FILE.parent.mkdir(parents=True, exist_ok=True)
+                with open(REQUEST_FILE, "w") as f:
                     f.write("False,False")
             except Exception as reset_error:
                 print(f"Could not reset image generation status: {reset_error}")
-            break
+            return False
 
 
 if __name__ == "__main__":
-    monitor_image_generation_requests()
+    raise SystemExit(0 if monitor_image_generation_requests() else 1)

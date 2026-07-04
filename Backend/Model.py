@@ -14,6 +14,25 @@ funcs = [
 # Initialize an empty list to store user messages.
 messages = []
 
+def _is_task_start(task: str) -> bool:
+    return any(task.startswith(func) for func in funcs)
+
+def ParseDecisionResponse(response_text: str):
+    response_parts = response_text.replace("\n", "").split(",")
+    tasks = []
+
+    for part in response_parts:
+        part = part.strip()
+        if not part:
+            continue
+
+        if _is_task_start(part):
+            tasks.append(part)
+        elif tasks:
+            tasks[-1] = f"{tasks[-1]}, {part}"
+
+    return [task for task in tasks if _is_task_start(task)]
+
 # Define the preamble that guides the AI model on how to categorize queries.
 preamble = """
 You are a very accurate Decision-Making Model, which decides what kind of a query is given to you.
@@ -29,6 +48,7 @@ You will decide whether a query is a 'general' query, a 'realtime' query, or is 
 -> Respond with 'system (task name)' if a query is asking to mute, unmute, volume up, volume down , etc. but if the query is asking to do multiple tasks, respond with 'system 1st task, system 2nd task', etc.
 -> Respond with 'content (topic)' if a query is asking to write any type of content like application, codes, emails or anything else about a specific topic but if the query is asking to write multiple types of content, respond with 'content 1st topic, content 2nd topic' and so on.
 -> Respond with 'google search (topic)' if a query is asking to search a specific topic on google but if the query is asking to search multiple topics on google, respond with 'google search 1st topic, google search 2nd topic' and so on.
+-> Respond with 'youtube control resume' if the user says only 'play', 'resume', or 'unpause' to control the current YouTube video. Do not use 'play' unless the user gives a song or video name.
 -> Respond with 'youtube control (action)' if the user wants to control an already-playing YouTube video. For example: 'pause the video' respond with 'youtube control pause', 'resume the video' respond with 'youtube control resume', 'make it fullscreen' respond with 'youtube control fullscreen', 'turn on captions' respond with 'youtube control captions', 'theater mode' respond with 'youtube control theater', 'ambient mode' respond with 'youtube control ambient', 'turn on autoplay' respond with 'youtube control autoplay', 'set speed to 1.5' respond with 'youtube control speed 1.5', 'slow down the video' respond with 'youtube control slow down', 'set a sleep timer for 30 minutes' respond with 'youtube control sleep timer 30', 'cancel the timer' respond with 'youtube control cancel timer', 'skip forward 10 seconds' respond with 'youtube control skip forward 10', 'skip back 10 seconds' respond with 'youtube control skip backward 10', 'volume 70' respond with 'youtube control volume 70', 'mute the video' respond with 'youtube control mute', 'next video' respond with 'youtube control next video', 'what is playing' respond with 'youtube control status', 'close youtube' respond with 'youtube control close youtube'.
 -> Respond with 'language english' if the user wants to switch to English mode. Example: 'switch to english', 'speak english', 'english mode' → 'language english'.
 -> Respond with 'language bangla' if the user wants to switch to Bangla mode. Example: 'বাংলায় বলো', 'switch to bangla', 'bangla mode' → 'language bangla'.
@@ -70,24 +90,7 @@ def FirstlayerDMM(prompt: str = "test"):
 
     response = response_obj.text
 
-    # Remove newline character and split responses into individual tasks
-    response = response.replace("\n", "")
-    response = response.split(",")
-
-    # Strip leading and trailing whitespaces from each task.
-    response = [i.strip() for i in response]
-
-    # Initialize an empty list to filter valid tasks.
-    temp = []
-
-    # Filter the tasks based on recognized function keywords.
-    for task in response:
-        for func in funcs:
-            if task.startswith(func):
-                temp.append(task)  # Add valid tasks to filtered list
-
-    # Update the response with the filtered list    model='command-r-plus',    model='command-r-plus', of tasks
-    response = temp
+    response = ParseDecisionResponse(response)
 
     if not response or any("(query)" in task for task in response):
         return [f"general {prompt}"]

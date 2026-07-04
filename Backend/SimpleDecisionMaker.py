@@ -133,6 +133,9 @@ class SimplePatternMatcher:
         if any(word in query_norm for word in ["mute", "unmute", "silence"]) and has_video_context:
             return "mute" if "unmute" not in query_norm else "unmute"
 
+        if query_norm == "play":
+            return "resume"
+
         if any(phrase in query_norm for phrase in ["pause the video", "pause video", "stop the video", "stop video"]):
             return "pause"
 

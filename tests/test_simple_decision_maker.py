@@ -12,6 +12,8 @@ class SimpleDecisionMakerTests(unittest.TestCase):
             "pause the video": ["youtube control pause"],
             "pause youtube": ["youtube control pause"],
             "resume the video": ["youtube control resume"],
+            "play": ["youtube control resume"],
+            "unpause": ["youtube control resume"],
             "make it fullscreen": ["youtube control fullscreen"],
             "turn on captions": ["youtube control captions"],
             "set speed to 1.5": ["youtube control speed 1.5"],

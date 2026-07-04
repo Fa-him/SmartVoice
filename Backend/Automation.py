@@ -7,7 +7,6 @@ from groq import Groq
 from Backend.Config import get_env, require_env
 from Backend.ReminderManager import ReminderParseError, create_reminder
 import webbrowser
-import subprocess
 import requests
 import keyboard
 import asyncio
@@ -57,12 +56,6 @@ def GoogleSearch(Topic):
 
 # Function to generate content using AI and save it to a file.
 def Content(Topic):
-
-    # Nested function to open a file in Notepad.
-    def OpenNotepad(File):
-        default_text_editor = 'notepad.exe' # Default text editor.
-        subprocess.Popen([default_text_editor, File]) # Open the file in Notepad.
-    
     # Nested function to generate content using the AI chatbot.
     def ContentWriterAI(prompt):
         messages.append({"role": "user", "content": f"{prompt}"}) # Add the user's prompt to messages.
@@ -96,8 +89,7 @@ def Content(Topic):
         file.write(ContentByAI) # Write the content to the file.
         file.close()
         
-    OpenNotepad(rf"Data\{Topic.lower().replace(' ', '')}.txt") # Open the file in Notepad.
-    return True # Indicate success.
+    return ContentByAI
 
 
 # Function to search for a topic on YouTube.
@@ -361,6 +353,10 @@ async def TranslateAndExecute(commands: list[str]):
             fun = asyncio.to_thread(CloseApp, command.removeprefix("close ")) # Schedule app closing.
             funcs.append(fun)
 
+        elif command == "play": # Resume current YouTube playback.
+            fun = asyncio.to_thread(YouTubeControl, "resume")
+            funcs.append(fun)
+
         elif command.startswith("play "): # Handle "play" commands.
             fun = asyncio.to_thread(PlayYoutube, command.removeprefix("play ")) # Schedule YouTube playback.
             funcs.append(fun)
@@ -388,6 +384,9 @@ async def TranslateAndExecute(commands: list[str]):
         elif command.startswith("reminder "): # Handle reminder commands.
             fun = asyncio.to_thread(SetReminder, command.removeprefix("reminder ")) # Schedule reminder creation.
             funcs.append(fun)
+
+        elif command.startswith("language "): # Handled in main before automation.
+            pass
             
         else:
             print(f"No Function Found. For {command}") # Print an error for unrecognized commands.

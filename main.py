@@ -8,11 +8,13 @@ from Frontend.GUI import (
     AnswerModifier,
     QueryModifier,
     GetMicrophoneStatus,
-    GetAssistantStatus)
+    GetAssistantStatus,
+    GetTextQuery,
+    ClearTextQuery)
 from Backend.Model import FirstlayerDMM
 from Backend.RealtimeSearchEngine import RealtimeSearchEngine
 from Backend.Automation import Automation
-from Backend.SpeechToText import SpeechRecognition, SpeechRecognitionError
+from Backend.SpeechToText import SpeechRecognition, SpeechRecognitionError, TranslateToEnglish
 from Backend.Chatbot import ChatBot
 from Backend.TextToSpeech import TextToSpeech
 from Backend.PerformanceLogger import logger
@@ -39,17 +41,51 @@ Assistantname = get_env("Assistantname", "SmartVoice")
 DefaultMessage = f'''{Username} : Hello {Assistantname}, How are you?
 {Assistantname} : Welcome {Username}. I am doing well. What can I assist you with?'''
 subprocesses = []
-Functions = ["open", "close", "play", "system", "content", "google search",
+Functions = ["open", "close", "play", "system", "google search",
              "youtube search", "youtube control", "reminder"]
 
 pattern_matcher = SimplePatternMatcher()
 COMPARISON_MODE = True
+
+def IsAutomationCommand(command):
+    return any(command == func or command.startswith(func + " ") for func in Functions)
+
+def ContentSpeechText(Answer):
+    text = Answer.strip()
+    lower_text = text.lower()
+    code_markers = [
+        "```", "#include", "int main", "using namespace", "public static",
+        "def ", "class ", "function ", "console.log", "return ",
+    ]
+
+    if text and len(text) <= 900 and not any(marker in lower_text for marker in code_markers):
+        return text
+
+    if language_manager.is_bangla():
+        return "আমি কনটেন্টটা চ্যাটে লিখে দিয়েছি। আপনি কপি করতে পারবেন।"
+
+    return "I wrote it in the chat. You can copy it from the document card."
 
 def ShowDefaultChatIfNotChats():
     try:
         File    = open(r'Data\ChatLog.json', "r", encoding='utf-8')
         content = File.read()
         File.close()
+        stripped_content = content.strip()
+        try:
+            parsed_content = json.loads(stripped_content) if stripped_content else []
+        except json.JSONDecodeError:
+            parsed_content = None
+
+        if parsed_content == []:
+            with open(r'Data\ChatLog.json', 'w', encoding='utf-8') as f:
+                json.dump([], f, indent=4)
+            with open(TempDirectoryPath('Database.data'), 'w', encoding='utf-8') as file:
+                file.write("")
+            with open(TempDirectoryPath('Responses.data'), 'w', encoding='utf-8') as file:
+                file.write("")
+            return
+
         if len(content) < 5:
             with open(r'Data\ChatLog.json', 'w', encoding='utf-8') as f:
                 json.dump([
@@ -216,6 +252,25 @@ def MainExecution():
 
     print(f"\nDecision : {Decision}\n")
 
+    NonLanguageDecision = [
+        item for item in Decision if not item.startswith("language ")
+    ]
+    LanguageMessage = None
+
+    for item in Decision:
+        if item.startswith("language "):
+            if "english" in item:
+                LanguageMessage = language_manager.force_set("en")
+            else:
+                LanguageMessage = language_manager.force_set("bn")
+            print(f"[Language] {LanguageMessage}")
+
+    if LanguageMessage and not NonLanguageDecision:
+        ShowTextToScreen(f"{Assistantname} : {LanguageMessage}")
+        SetAssistantStatus(language_manager.get_status("answering"))
+        TextToSpeech(LanguageMessage)
+        return True
+
     G = any(i for i in Decision if i.startswith("general"))
     R = any(i for i in Decision if i.startswith("realtime"))
 
@@ -237,27 +292,36 @@ def MainExecution():
                 ImageExecution = True
                 apis_used.append('huggingface')
 
-        for queries in Decision:
-            if not TaskExecution:
-                if any(func in queries for func in Functions):
-                    automation_feedback = run(Automation(list(Decision)))
-                    TaskExecution = True
-                    if automation_feedback and not (G or R):
-                        ShowTextToScreen(
-                            f"{Assistantname} : {' '.join(automation_feedback)}"
-                        )
+        automation_commands = [
+            queries for queries in Decision if IsAutomationCommand(queries)
+        ]
+        if automation_commands:
+            automation_feedback = run(Automation(automation_commands))
+            TaskExecution = True
+            if automation_feedback and not (G or R):
+                ShowTextToScreen(
+                    f"{Assistantname} : {' '.join(automation_feedback)}"
+                )
 
         if ImageExecution:
             try:
                 require_env("HuggingFaceAPIKey")
+                ImagePrompt = ImagePromptFromDecision(ImageGenerationQuery)
                 with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
-                    file.write(f"{ImageGenerationQuery},True")
+                    file.write(f"{ImagePrompt},True")
+                ShowTextToScreen(f"{Assistantname} : Generating image for: {ImagePrompt}")
                 p1 = subprocess.Popen(
-                    [sys.executable, r'Backend\ImageGeneration.py'],
+                    [sys.executable, "-m", "Backend.ImageGeneration"],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                    stdin=subprocess.PIPE, shell=False
+                    stdin=subprocess.DEVNULL, shell=False,
+                    text=True, encoding="utf-8", errors="replace"
                 )
                 subprocesses.append(p1)
+                threading.Thread(
+                    target=WatchImageGenerationProcess,
+                    args=(p1,),
+                    daemon=True
+                ).start()
             except Exception as e:
                 print(f"Error starting ImageGeneration.py: {e}")
                 success       = False
@@ -335,6 +399,35 @@ def MainExecution():
                     )
                     return True
 
+                elif Queries.startswith("content "):
+                    SetAssistantStatus(language_manager.get_status("thinking"))
+                    QueryFinal = Queries.replace("content ", "", 1)
+                    ContentPrompt = (
+                        "Write this as complete polished content. "
+                        "Return only the requested content, no extra notes: "
+                        f"{QueryFinal}"
+                    )
+                    Answer = ChatBot(QueryModifier(ContentPrompt))
+                    apis_used.append('groq')
+                    ShowTextToScreen(f"{Assistantname} : {Answer}")
+
+                    response_time = time.time() - response_start
+                    tts_start = time.time()
+                    SetAssistantStatus(language_manager.get_status("answering"))
+                    TextToSpeech(ContentSpeechText(Answer))
+                    tts_time = time.time() - tts_start
+                    total_time = time.time() - start_time
+                    logger.log_interaction(
+                        query=Query, decision=Decision,
+                        execution_time=total_time, apis_used=apis_used,
+                        success=success, error_message=error_message,
+                        decision_time=decision_time,
+                        response_generation_time=response_time,
+                        tts_time=tts_time
+                    )
+                    SetAssistantStatus("Available...")
+                    return True
+
                 elif "exit" in Queries:
                     QueryFinal = "ঠিক আছে, বিদায়!" if language_manager.is_bangla() else "Okay, Bye!"
                     Answer     = ChatBot(QueryModifier(QueryFinal))
@@ -356,15 +449,8 @@ def MainExecution():
                     )
                     QApplication.instance().quit()
                     return True
-                elif "language" in Queries:
-                    if "english" in Queries:
-                        msg = language_manager.force_set("en")
-                    else:
-                        msg = language_manager.force_set("bn")
-                    ShowTextToScreen(f"{Assistantname} : {msg}")
-                    SetAssistantStatus(language_manager.get_status("answering"))
-                    TextToSpeech(msg)
-                    return True
+                elif Queries.startswith("language "):
+                    continue
 
             if TaskExecution and not (G or R):
                 total_time = time.time() - start_time
@@ -393,10 +479,69 @@ def MainExecution():
         import traceback
         traceback.print_exc()
 
+def PrepareTextQuery(TextQuery):
+    TextQuery = TextQuery.strip()
+    detected_lang = language_manager.detect_and_set(TextQuery)
+    print(f"\n[TextInput] Raw text: '{TextQuery}'")
+    print(
+        f"[TextInput] Detected: {detected_lang.upper()} "
+        f"| Voice: {language_manager.get_tts_voice()}"
+    )
+
+    if detected_lang == "en":
+        return QueryModifier(TextQuery)
+
+    SetAssistantStatus(language_manager.get_status("translating"))
+    english_text = TranslateToEnglish(TextQuery)
+    print(f"[TextInput] Translated to EN: '{english_text}'")
+    return QueryModifier(english_text)
+
+def TextExecution(TextQuery):
+    global SpeechRecognition
+
+    Query = PrepareTextQuery(TextQuery)
+    original_speech_recognition = SpeechRecognition
+    SpeechRecognition = lambda: Query
+
+    try:
+        return MainExecution()
+    finally:
+        SpeechRecognition = original_speech_recognition
+
+def ImagePromptFromDecision(DecisionQuery):
+    Prompt = DecisionQuery.strip()
+    for Prefix in ("generate image", "generate"):
+        if Prompt.lower().startswith(Prefix):
+            Prompt = Prompt[len(Prefix):].strip()
+            break
+    return Prompt or DecisionQuery.strip()
+
+def WatchImageGenerationProcess(Process):
+    stdout, stderr = Process.communicate()
+
+    if stdout:
+        print(stdout, end="")
+    if stderr:
+        print(stderr, end="", file=sys.stderr)
+
+    if Process.returncode == 0:
+        ShowTextToScreen(f"{Assistantname} : Image generated.")
+    else:
+        details = (stderr or stdout or "Unknown image generation error.").strip()
+        ShowTextToScreen(f"{Assistantname} : Image generation failed: {details[-500:]}")
+    SetAssistantStatus("Available...")
+
 def FirstThread():
     while True:
         try:
             HandleDueReminders()
+            TextQuery = GetTextQuery().strip()
+            if TextQuery:
+                ClearTextQuery()
+                SetMicrophoneStatus("False")
+                TextExecution(TextQuery)
+                continue
+
             CurrentStatus = GetMicrophoneStatus()
             if CurrentStatus == "True":
                 MainExecution()

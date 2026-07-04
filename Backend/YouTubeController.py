@@ -199,6 +199,7 @@ class YouTubePlayer:
         opts.add_argument("--start-maximized")
         opts.add_argument("--disable-infobars")
         opts.add_argument("--disable-notifications")
+        opts.add_argument("--autoplay-policy=no-user-gesture-required")
         opts.add_argument(
             "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -342,9 +343,15 @@ class YouTubePlayer:
 
             self._wait_for_video_ready(timeout=25)
             self._dismiss_dialogs()
+            playback_started = self._ensure_video_playing(timeout=8)
             self._is_launched = True
-            log.info(f"Now playing: {query}")
-            return f"Now playing {query} on YouTube."
+            if playback_started:
+                log.info(f"Now playing: {query}")
+                return f"Now playing {query} on YouTube."
+            return (
+                f"Opened {query} on YouTube, but playback may still be paused. "
+                "Say 'play' to resume."
+            )
 
         except SessionNotCreatedException:
             self._driver = None
@@ -374,6 +381,45 @@ class YouTubePlayer:
             except Exception:
                 pass
 
+    def _ensure_video_playing(self, timeout: float = 8.0) -> bool:
+        """Start playback after launch if YouTube leaves the video paused."""
+        deadline = time.time() + timeout
+        clicked_play_button = False
+
+        while time.time() < deadline:
+            state = self._js(
+                "const v = document.querySelector('video.html5-main-video');"
+                "if(!v) return 'no_video';"
+                "return v.paused ? 'paused' : 'playing';"
+            )
+            if state == "playing":
+                return True
+
+            if state == "paused":
+                self._js(
+                    "const v = document.querySelector('video.html5-main-video');"
+                    "if(v){"
+                    "  v.muted = false;"
+                    "  const p = v.play();"
+                    "  if(p && p.catch) p.catch(() => {});"
+                    "}"
+                )
+
+                if not clicked_play_button:
+                    time.sleep(0.5)
+                    state_after_js = self._js(
+                        "const v = document.querySelector('video.html5-main-video');"
+                        "return v ? (v.paused ? 'paused' : 'playing') : 'no_video';"
+                    )
+                    if state_after_js == "playing":
+                        return True
+                    self._click(self._SEL["play_btn"], timeout=4)
+                    clicked_play_button = True
+
+            time.sleep(0.5)
+
+        return False
+
     # ── Play / Pause ──────────────────────────────────────────────────────────
 
     def play_pause(self) -> str:
@@ -396,11 +442,9 @@ class YouTubePlayer:
     def play(self) -> str:
         self._check_launched()
         try:
-            self._js(
-                "const v = document.querySelector('video.html5-main-video');"
-                "if(v) v.play();"
-            )
-            return "Video playing."
+            if self._ensure_video_playing(timeout=5):
+                return "Video playing."
+            return "Tried to play the video, but it still looks paused."
         except Exception as e:
             return f"Could not play: {str(e)[:60]}"
 
@@ -721,17 +765,21 @@ class YouTubePlayer:
         Command is the text AFTER the 'youtube control' prefix is stripped.
         """
         cmd = command.lower().strip()
-        is_play_cmd = cmd.startswith("play ") or cmd == "play"
+        is_launch_cmd = cmd.startswith("play ")
+        is_resume_cmd = cmd in {"play", "resume", "continue", "unpause", "start video"}
 
-        if not is_play_cmd and not self._is_launched:
+        if not is_launch_cmd and not self._is_launched:
             return (
                 "YouTube is not open yet. "
                 "Say 'play' followed by a song name to start."
             )
 
         try:
-            if is_play_cmd:
+            if is_launch_cmd:
                 return self.launch(cmd.removeprefix("play").strip())
+
+            if is_resume_cmd:
+                return self.play()
 
             if any(w in cmd for w in ["pause", "stop video"]):
                 return self.pause()
