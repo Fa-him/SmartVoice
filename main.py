@@ -147,6 +147,7 @@ def MainExecution():
         Query = SpeechRecognition()
     except SpeechRecognitionError as e:
         error_message = str(e)
+        SetMicrophoneStatus("False")
         ShowTextToScreen(f"{Assistantname} : {error_message}")
         SetAssistantStatus("Available...")
         logger.log_interaction(

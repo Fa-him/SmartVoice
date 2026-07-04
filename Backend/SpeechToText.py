@@ -23,6 +23,7 @@ class SpeechRecognitionError(RuntimeError):
 DATA_DIR = ROOT_DIR / "Data"
 TEMP_DIR = ROOT_DIR / "Frontend" / "Files"
 VOICE_HTML_PATH = DATA_DIR / "Voice.html"
+CHROME_PROFILE_DIR = DATA_DIR / "ChromeSpeechProfile"
 
 _driver = None
 
@@ -137,14 +138,24 @@ def _write_voice_html() -> None:
 
 
 def _build_chrome_options() -> Options:
+    CHROME_PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+
     options = Options()
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     )
+    options.add_argument(f"--user-data-dir={CHROME_PROFILE_DIR}")
     options.add_argument("--allow-file-access-from-files")
+    options.add_argument("--no-first-run")
+    options.add_argument("--no-default-browser-check")
+    options.add_argument("--disable-sync")
     options.add_argument("--log-level=3")
     options.add_argument("--window-size=420,260")
+    options.add_experimental_option("prefs", {
+        "profile.default_content_setting_values.media_stream_mic": 1,
+        "profile.default_content_setting_values.notifications": 2,
+    })
 
     if _bool_env("SpeechRecognitionAutoGrantMic", True):
         options.add_argument("--use-fake-ui-for-media-stream")
@@ -181,6 +192,26 @@ def _get_driver():
 
     _driver = _build_driver()
     return _driver
+
+
+def _keep_only_speech_tab(driver, voice_uri: str) -> None:
+    try:
+        speech_handle = driver.current_window_handle
+        for handle in list(driver.window_handles):
+            driver.switch_to.window(handle)
+            if driver.current_url == voice_uri:
+                speech_handle = handle
+                break
+
+        for handle in list(driver.window_handles):
+            if handle == speech_handle:
+                continue
+            driver.switch_to.window(handle)
+            driver.close()
+
+        driver.switch_to.window(speech_handle)
+    except WebDriverException:
+        pass
 
 
 def close_speech_driver() -> None:
@@ -260,7 +291,9 @@ def _capture_transcript(timeout_seconds: float) -> str:
     driver = _get_driver()
 
     try:
-        driver.get(Path(VOICE_HTML_PATH).resolve().as_uri())
+        voice_uri = Path(VOICE_HTML_PATH).resolve().as_uri()
+        driver.get(voice_uri)
+        _keep_only_speech_tab(driver, voice_uri)
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.ID, "start")))
 
@@ -270,11 +303,13 @@ def _capture_transcript(timeout_seconds: float) -> str:
         deadline = time.monotonic() + timeout_seconds
         last_error = ""
         while time.monotonic() < deadline:
-            text = driver.find_element(By.ID, "output").text.strip()
+            output_elements = driver.find_elements(By.ID, "output")
+            text = ((output_elements[0].text if output_elements else "") or "").strip()
             if text:
                 return text
 
-            error_text = driver.find_element(By.ID, "error").text.strip()
+            error_elements = driver.find_elements(By.ID, "error")
+            error_text = ((error_elements[0].text if error_elements else "") or "").strip()
             if error_text and error_text != last_error:
                 last_error = error_text
                 if error_text not in {"no-speech"}:

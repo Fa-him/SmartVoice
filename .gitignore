@@ -219,6 +219,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # SmartVoice runtime/generated files
+Data/ChromeSpeechProfile/
 Data/Chatlog.json
 Data/reminders.json
 Data/Voice.html

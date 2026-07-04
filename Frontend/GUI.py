@@ -1,15 +1,45 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QStackedWidget, QWidget, QLineEdit, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QFrame, QLabel, QSizePolicy
 from PyQt5.QtGui import QIcon, QPainter, QMovie, QColor, QTextCharFormat, QFont, QPixmap, QTextBlockFormat
 from PyQt5.QtCore import Qt, QSize, QTimer
-from Backend.Config import get_env
+from Backend.Config import ROOT_DIR, get_env
 import sys
 import os
 
 Assistantname = get_env("Assistantname", "SmartVoice")
-current_dir = os.getcwd()
 old_chat_message = ""
-TempDirPath = rf'{current_dir}\Frontend\Files'
-GraphicsDirPath = rf'{current_dir}\Frontend\Graphics'
+TempDirPath = str(ROOT_DIR / "Frontend" / "Files")
+GraphicsDirPath = str(ROOT_DIR / "Frontend" / "Graphics")
+
+DEFAULT_TEMP_FILES = {
+    "Mic.data": "False",
+    "Status.data": "Available...",
+    "Responses.data": "",
+    "Database.data": "",
+}
+
+def EnsureTempFiles():
+    os.makedirs(TempDirPath, exist_ok=True)
+    for filename, default_value in DEFAULT_TEMP_FILES.items():
+        path = TempDirectoryPath(filename)
+        if not os.path.exists(path):
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(default_value)
+
+def ReadTempFile(filename, default=""):
+    EnsureTempFiles()
+    path = TempDirectoryPath(filename)
+    try:
+        with open(path, "r", encoding="utf-8") as file:
+            return file.read()
+    except FileNotFoundError:
+        with open(path, "w", encoding="utf-8") as file:
+            file.write(default)
+        return default
+
+def WriteTempFile(filename, value):
+    EnsureTempFiles()
+    with open(TempDirectoryPath(filename), "w", encoding="utf-8") as file:
+        file.write(value)
 
 def AnswerModifier(Answer):
     lines = Answer.split('\n')
@@ -38,28 +68,28 @@ def QueryModifier(Query):
     return new_query.capitalize()
 
 def SetMicrophoneStatus(Command):
-    with open(rf'{TempDirPath}\Mic.data', "w", encoding='utf-8') as file:
-        file.write(Command)
+    WriteTempFile("Mic.data", Command)
 
 def GetMicrophoneStatus():
-    with open(rf'{TempDirPath}\Mic.data', "r", encoding='utf-8') as file:
-        Status = file.read()
-    return Status
+    return ReadTempFile("Mic.data", "False")
 
-def SetAssistantStatus(Status):
-    with open(rf'{TempDirPath}\Status.data', "w", encoding='utf-8') as file:
-        file.write(Status)
-
-def GetAssistantStatus():
-    with open(rf'{TempDirPath}\Status.data', "r", encoding='utf-8') as file:
-        Status = file.read()
-    return Status
-
-def MicButtonInitialed():
+def SetMicInactive():
     SetMicrophoneStatus("False")
 
-def MicButtonClosed():
+def SetMicActive():
     SetMicrophoneStatus("True")
+
+def SetAssistantStatus(Status):
+    WriteTempFile("Status.data", Status)
+
+def GetAssistantStatus():
+    return ReadTempFile("Status.data", "Available...")
+
+def MicButtonInitialed():
+    SetMicInactive()
+
+def MicButtonClosed():
+    SetMicActive()
 
 def GraphicsDirectoryPath(Filename):
     Path = rf'{GraphicsDirPath}\{Filename}'
@@ -70,8 +100,9 @@ def TempDirectoryPath(Filename):
     return Path
 
 def ShowTextToScreen(Text):
-    with open(rf'{TempDirPath}\Responses.data', "w", encoding='utf-8') as file:
-        file.write(Text)
+    WriteTempFile("Responses.data", Text)
+
+EnsureTempFiles()
 
 class ChatSection(QWidget):
 
@@ -115,7 +146,7 @@ class ChatSection(QWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.loadMessages)
         self.timer.timeout.connect(self.SpeechRecogText)
-        self.timer.start(5)
+        self.timer.start(100)
         self.chat_text_edit.viewport().installEventFilter(self)
         self.setStyleSheet("""
             QScrollBar:vertical {
@@ -159,8 +190,7 @@ class ChatSection(QWidget):
 
         global old_chat_message
 
-        with open(TempDirectoryPath('Responses.data'), "r", encoding='utf-8') as file:
-            messages = file.read()
+        messages = ReadTempFile("Responses.data")
 
         if None==messages:
             pass
@@ -176,9 +206,8 @@ class ChatSection(QWidget):
             old_chat_message = messages
 
     def SpeechRecogText(self):
-        with open(TempDirectoryPath('Status.data'), "r", encoding='utf-8') as file:
-            messages = file.read()
-            self.label.setText(messages)
+        messages = ReadTempFile("Status.data", "Available...")
+        self.label.setText(messages)
 
     def load_icon(self, path, width=60, height=60):
         pixmap = QPixmap(path)
@@ -227,13 +256,13 @@ class InitialScreen(QWidget):
         movie.start()
         gif_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.icon_label = QLabel()
-        pixmap = QPixmap(GraphicsDirectoryPath('Mic_on.png'))
+        pixmap = QPixmap(GraphicsDirectoryPath('Mic_off.png'))
         new_pixmap = pixmap.scaled(60, 60)
         self.icon_label.setPixmap(new_pixmap)
         self.icon_label.setFixedSize(150,150)
         self.icon_label.setAlignment(Qt.AlignCenter)
-        self.toggled = True
-        self.toggle_icon()
+        self.mic_active = False
+        SetMicInactive()
         self.icon_label.mousePressEvent = self.toggle_icon
         self.label = QLabel("")
         self.label.setStyleSheet("color: white; font-size:16px ; margin-bottom:0;")
@@ -247,12 +276,16 @@ class InitialScreen(QWidget):
         self.setStyleSheet("background-color: black;")
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.SpeechRecogText)
-        self.timer.start(5)
+        self.timer.start(100)
 
     def SpeechRecogText(self):
-        with open(TempDirectoryPath('Status.data'), "r", encoding='utf-8') as file:
-            messages = file.read()
+        messages = ReadTempFile("Status.data", "Available...")
         self.label.setText(messages)
+        mic_active = GetMicrophoneStatus().strip() == "True"
+        if mic_active != self.mic_active:
+            self.mic_active = mic_active
+            icon_name = "Mic_on.png" if mic_active else "Mic_off.png"
+            self.load_icon(GraphicsDirectoryPath(icon_name), 60, 60)
 
     def load_icon(self, path, width=60, height=60):
         pixmap = QPixmap(path)
@@ -261,15 +294,15 @@ class InitialScreen(QWidget):
 
     def toggle_icon(self, event=None):
 
-        if self.toggled:
+        self.mic_active = not self.mic_active
+
+        if self.mic_active:
             self.load_icon(GraphicsDirectoryPath('Mic_on.png'), 60, 60)
-            MicButtonInitialed()
+            SetMicActive()
 
         else:
             self.load_icon(GraphicsDirectoryPath('Mic_off.png'), 60, 60)
-            MicButtonClosed()
-
-        self.toggled = not self.toggled
+            SetMicInactive()
 
 class MessageScreen(QWidget):
 
@@ -419,6 +452,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(stacked_widget)
 
 def GraphicalUserInterface():
+    SetMicInactive()
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()

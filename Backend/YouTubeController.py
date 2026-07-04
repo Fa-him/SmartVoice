@@ -55,11 +55,8 @@ except ImportError:
     SELENIUM_AVAILABLE = False
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
-logging.basicConfig(
-    level=logging.INFO,
-    format="[YouTubeController] %(levelname)s: %(message)s"
-)
 log = logging.getLogger("YouTubeController")
+log.addHandler(logging.NullHandler())
 
 
 # ─────────────────────────────────────────────────────────────────────────────
