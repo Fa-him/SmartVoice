@@ -46,6 +46,17 @@ class SimpleDecisionMakerTests(unittest.TestCase):
             ["reminder in 10 minutes to stretch"],
         )
 
+    def test_reminder_action_routes(self):
+        cases = {
+            "show my reminders": ["reminder show my reminders"],
+            "cancel my medicine reminder": ["reminder cancel my medicine reminder"],
+            "snooze this for 10 minutes": ["reminder snooze this for 10 minutes"],
+        }
+
+        for query, expected in cases.items():
+            with self.subTest(query=query):
+                self.assertEqual(self.matcher.decide(query), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

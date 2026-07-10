@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from rich import print
 from groq import Groq
 from Backend.Config import get_env, require_env
-from Backend.ReminderManager import ReminderParseError, create_reminder
+from Backend.ReminderActions import handle_reminder_command
 import webbrowser
 import requests
 import keyboard
@@ -113,9 +113,7 @@ def PlayYoutube(query):
 
 def SetReminder(command):
     try:
-        return create_reminder(command)
-    except ReminderParseError as e:
-        return f"Could not set reminder: {e}"
+        return handle_reminder_command(command)
     except Exception as e:
         print(f"Reminder failed: {e}")
         return f"Reminder failed: {str(e)[:80]}"

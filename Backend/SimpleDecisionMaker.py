@@ -41,6 +41,15 @@ class SimplePatternMatcher:
         self.reminder_keywords = [
             'remind me', 'set a reminder', 'reminder'
         ]
+        self.reminder_action_keywords = [
+            'show reminders', 'show my reminders', 'list reminders',
+            'list my reminders', 'view reminders', 'view my reminders',
+            'check reminders', 'check my reminders', 'what are my reminders',
+            'cancel reminder', 'cancel my reminder', 'cancel all reminders',
+            'delete reminder', 'remove reminder', 'clear reminders',
+            'snooze reminder', 'snooze this', 'delay reminder',
+            'postpone reminder'
+        ]
 
         self.exit_keywords = ['bye', 'goodbye', 'exit', 'quit', 'see you']
 
@@ -188,8 +197,23 @@ class SimplePatternMatcher:
                     break
 
         # Check for reminders
-        for keyword in self.reminder_keywords:
+        for keyword in self.reminder_action_keywords:
             if keyword in query_lower:
+                decisions.append(f"reminder {query_lower}")
+                automation_found = True
+                break
+
+        if not automation_found and "reminder" in query_lower:
+            reminder_action_words = [
+                "show", "list", "view", "check", "cancel", "delete",
+                "remove", "clear", "snooze", "delay", "postpone",
+            ]
+            if any(word in query_lower for word in reminder_action_words):
+                decisions.append(f"reminder {query_lower}")
+                automation_found = True
+
+        for keyword in self.reminder_keywords:
+            if not automation_found and keyword in query_lower:
                 payload = query_lower.split(keyword, 1)[-1].strip()
                 if payload:
                     decisions.append(f"reminder {payload}")

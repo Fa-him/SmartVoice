@@ -28,7 +28,7 @@ from Backend.PerformanceLogger import logger
 from Backend.SimpleDecisionMaker import SimplePatternMatcher
 from Backend.LanguageManager import language_manager
 from Backend.Config import get_env, require_env
-from Backend.ReminderManager import pop_due_reminders
+from Backend.ReminderActions import pop_due_reminders
 from asyncio import run
 from time import sleep
 import threading
