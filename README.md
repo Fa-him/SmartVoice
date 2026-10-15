@@ -39,7 +39,7 @@ Speech recognition uses Chrome through Selenium. For real microphone input, keep
 
 Image generation uses Hugging Face Inference Providers through `huggingface_hub`. The default model is `black-forest-labs/FLUX.1-schnell`; change `HuggingFaceImageModel` or `HuggingFaceProvider` in `.env` if your Hugging Face account/provider access requires a different route.
 
-## Run
+## Run 
 
 ```powershell
 .\.venv\Scripts\activate
